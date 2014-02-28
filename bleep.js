@@ -67,7 +67,7 @@ window.Bleep = (function() {
 
       var o = context.createOscillator();
       var g = context.createGain();
-
+      o.type = Settings["waveform"];
       o.connect(g);
       g.connect(context.destination);
       g.gain.value = 0;
@@ -124,8 +124,14 @@ window.Bleep = (function() {
     eventQueue.push(e);
   }
 
-  Bleep.setWaveform = function(w){
-
+  Bleep.setWaveform = function(s){
+    var e = new Event();
+    e.isSetting = true;
+    e.isNote = 0;
+    e.duration = 0;
+    e.settingName = "waveform";
+    e.settingVal = s;
+    eventQueue.push(e);
   }
 
 
