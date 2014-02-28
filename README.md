@@ -16,7 +16,7 @@ Bleep.bloop();
 ~~~
 You can also call `bloop()` with a fixed value of notes to play.
 ~~~ js
-Bleep.bloop(16);
+Bleep.bloop(8);
 ~~~
 
 
@@ -34,15 +34,30 @@ Bleep.stop();
 
 Add a pause to the queue with `rest()`
 ~~~ js
-Bleep.rest();
+Bleep.rest(8); // will rest for length of 8th note
+Bleep.rest(1); // will rest for length of whole note
+Bleep.rest("R8"); //alternate syntax for 8th note
+Bleep.rest("R8"); //alternate syntax for whole note
 ~~~
 
 Add a simple tone to the queue with `tone()`
 ~~~ js
-Bleep.tone("C4"); //Bleep.tone(note, duration);
+Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
 Bleep.tone("A#2",16); //Bleep.tone(note, duration);
 Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
 Bleep.start();
+~~~
+
+Play a custom sequence with `sequence()`
+~~~ js
+// Formatted to one quarter measure per line
+var mySequence = [
+	"A4", "A5", "A4", "A5", // Four 16th notes
+	"R4", 									// rest for a quarter measure
+	"R8",       ["C4", 8]   // 8th rest and an eighth note
+	"E4"										// One quarter note
+]
+Bleep.sequence(mySequence);
 ~~~
 
 ~~~ js
