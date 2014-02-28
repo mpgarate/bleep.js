@@ -12,6 +12,10 @@ Calling `bloop()` generates a short, pleasing retro arp sound.
 ~~~ js
 Bleep.bloop();
 ~~~
+You can also call `bloop()` with a fixed value of notes to play.
+~~~ js
+Bleep.bloop(16);
+~~~
 
 
 Generate your own arpeggio with `arp`
