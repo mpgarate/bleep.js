@@ -27,11 +27,6 @@ Bleep.start();
 ~~~
 defaults: ```Bleep.arp(key = "Eb", scale = major, duration = 16 notes, tempo = 120, octave = 4)```
 
-Silence all sounds and clear the queue with `stop()`
-~~~ js
-Bleep.stop();
-~~~
-
 Add a pause to the queue with `rest()`
 ~~~ js
 Bleep.rest(8); // will rest for length of 8th note
