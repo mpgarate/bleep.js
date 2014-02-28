@@ -14,6 +14,9 @@ Bleep.arp("C", "Minor", 32, 120);
 // Silence all sounds and clear the queue
 Bleep.stop();
 
+// Add a pause to the queue
+Bleep.rest();
+
 // Generate a simple tone
 Bleep.tone("C4"); //Bleep.tone(note, duration);
 Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
@@ -22,5 +25,5 @@ Bleep.bloopScoopDaWoop(); // Here be dragons
 
 // Configure your Bleep
 // Adjust these before calling arp, bloop, tone
-Bleep.waveform("sine"); // indicate sine, sqaure, etc. Custom waveforms on the wishlist.
+Bleep.waveform = "sine"; // indicate sine, sqaure, etc. Custom waveforms on the wishlist.
 

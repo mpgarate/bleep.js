@@ -1,4 +1,4 @@
-$( document ).ready(function() {
+$( document ).ready(function() { /*
     var context = new webkitAudioContext(),
     oscillator = context.createOscillator();
     oscillator.connect(context.destination); // Connect to speakers
@@ -23,4 +23,9 @@ $( document ).ready(function() {
   });
 
   console.log(StepsToHzNote(1));
+  */
+
+  $('.start-tone').click(function(){
+    Bleep.tone("D");
+  });
 });

@@ -12,7 +12,7 @@ var half_steps_from_a = function(note,octave){
 	return note + (octave * 12);
 }
 
-var charToHzNote = function(s){
+var charToNoteIndex = function(s, offset){
 	// Get ASCII value of char
 	var i = s.charCodeAt(0);
 
@@ -27,7 +27,7 @@ var charToHzNote = function(s){
 	// refer to notes as in range 0-6 
 	i -= 65;
 
-	// space out to #of half steps from A
+	// space out to # of half steps from A
 	switch(i){
 		case 0: i = 0; break; //A
 		case 1: i = 2; break; //B
@@ -38,18 +38,25 @@ var charToHzNote = function(s){
 		case 6: i = 10; break; //G
 	}
 
-	return StepsToHzNote(half_steps_from_a(i));
+	// adjust for sharp or flat note
+	i += offset;
+
+	return half_steps_from_a(i);
 }
 
-var StringToHzNote = function(s){
+// offset handles sharp or flat
+var StringToNoteIndex = function(s,offset){
 	if(s === undefined){
 		return null;
+	}
+	if(typeof offset === undefined){
+		offset = 0;
 	}
 	else if(s === ""){
 		return null;
 	}
 	else if(s.length === 1){
-		return charToHzNote(s);
+		return charToNoteIndex(s,offset);
 	}
 
 }
