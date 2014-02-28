@@ -3,7 +3,7 @@ Bleep.js
 
 Retro tones in js, one note at a time. 
 
-When calling Bloop, notes are appended to an asynchronous playback queue. This allows composing scores directly in javascript. 
+With Bleep, notes are appended to an asynchronous playback queue. This allows composing scores directly in javascript. 
 
 Basic usage
 -----------
