@@ -37,7 +37,7 @@ Add a pause to the queue with `rest()`
 Bleep.rest(8); // will rest for length of 8th note
 Bleep.rest(1); // will rest for length of whole note
 Bleep.rest("R8"); // alternate syntax for 8th note
-Bleep.rest("R8"); // alternate syntax for whole note
+Bleep.rest("R1"); // alternate syntax for whole note
 Bleep.tone("R8"); // also legal
 ~~~
 
