@@ -46,8 +46,9 @@ Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
 Bleep.bloopScoopDaWoop(); // Here be dragons
 ~~~
 
-// Configure your Bleep
-// Adjust these before calling arp, bloop, tone
-Bleep.waveform = "sine"; // indicate sine, sqaure, etc. Custom waveforms on the wishlist.
-
-https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#dfn-OscillatorNode
+Configure your Bleep
+--------
+Adjust these before calling arp, bloop, tone
+~~~ js
+Bleep.waveform = "sine"; // indicate sine, sqaure, sawtooth, triangle
+~~~
