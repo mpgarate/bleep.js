@@ -36,15 +36,18 @@ window.Bleep = (function() {
   Bleep.start = function(){
   	var playTime = 0;
   	var note;
+
   	while(noteQueue.length > 0){
   		note = noteQueue.shift();
 
 			var o = context.createOscillator();
 			var g = context.createGainNode();
 
-	    o.frequency.value = parseFloat(note.HzNote); 
 			o.connect(g);
 			g.connect(context.destination);
+			g.gain.value = 0;
+    	o.frequency.value = parseFloat(note.HzNote); 
+			o.start(0);
 
   		Bleep.__playNote(note,playTime,o,g);
 
@@ -54,17 +57,20 @@ window.Bleep = (function() {
 
   Bleep.__playNote = function(note, playTime, o, g){
   	setTimeout(function(){
-	    o.start(0);
+	    g.gain.value = 1;
   	}, playTime);
 
 		// fade note to prevent pop
     setTimeout(function(){
-			g.gain.setTargetAtTime(0, 0, 0.01);
-    }, playTime + note.durationMs);
+			//g.gain.setTargetAtTime(0, 0, 0.01);
+			g.gain.value = 0;
+    }, playTime + note.durationMs - 10);
 
     // kill oscillator shortly after
     setTimeout(function(){
     	o.stop(0);
+	    o = null;
+	    g = null;
     }, playTime + note.durationMs * 1.5);
   }
 
