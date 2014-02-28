@@ -57,12 +57,15 @@ window.Bleep = (function() {
 		oscillator.connect(g);
     oscillator.start(0); // Start generating sound immediately
 		g.connect(context.destination);
+
+
+		var waitTime =  duration * (Settings.bpm / 32);
     setTimeout(function(){
 			g.gain.setTargetAtTime(0, 0, 0.01);
-    }, duration * (Settings.bpm / 32));
+    }, waitTime);
     setTimeout(function(){
     oscillator.stop(0);
-    }, duration * (Settings.bpm / 32) + 1);
+    }, waitTime * 1.5);
   }
 
 	return Bleep;
