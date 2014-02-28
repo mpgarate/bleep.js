@@ -1,15 +1,19 @@
 var StepsToHzNote = function(halfSteps){
 	var value = Math.pow(1.059460646483, halfSteps) * 440;
-	console.log(value);
+	console.log("to hz val is:" + value + " halfSteps:" + halfSteps);
 	return value;
 }
 
-var halfStepsFromA = function(note,octave){
-	// Default to octave 4
+var halfStepsFromA = function(noteIndex,octave){
+	// Convert octave value
+	// MIDI octave 4 is octave 0
+	octave = octave - 4;
+
+	// Default to octave 0 (where you find middle C)
 	if (typeof octave === 'undefined'){
 		octave = 0;
 	}
-	return note + (octave * 12);
+	return noteIndex + (octave * 12);
 }
 
 var charToNoteIndex = function(s, offset){
@@ -41,7 +45,7 @@ var charToNoteIndex = function(s, offset){
 	// adjust for sharp or flat note
 	i += offset;
 
-	return halfStepsFromA(i);
+	return i;
 }
 
 // offset handles sharp or flat
@@ -62,19 +66,19 @@ var StringToNoteIndex = function(s,offset){
 }
 
 
-  var stringToSteps = function(s,octave){
+  var stringToHzNote = function(s,octave){
 		var offset = 0; // handle sharp or flat
 		if (typeof s === 'undefined' || s === ''){
 			s = 'A';
 		}
 		// set default or get octave from note string
-		if (octave === 'undefined'){
-			if (isNaN(s.charAt(s.length))){
+		if (typeof octave === 'undefined'){
+			if (isNaN(s.charAt(s.length-1))){
 				octave = 4;	
 			}
 			else{
-				octave = s.charAt(s.length);
-				s = s.split(s.length - 1);
+				octave = s.charAt(s.length -1);
+				s = s.substr(0,s.length - 1);
 			}
 		}
 
@@ -82,16 +86,20 @@ var StringToNoteIndex = function(s,offset){
 			var char1 = s.charAt(1);
 			if(char1 === '#'){
 				offset = 1;
+				s = s.substr(0,1);
 			}
 			else if (char1 === 'b'){
 				offset = -1;
+				s = s.substr(0,1);
 			}
 		}
 
-		console.log("s: " + s + " offset: " + offset + "oct: " + octave);
+		console.log("s: " + s + " offset: " + offset + " oct: " + octave);
 
 		var noteIndex = charToNoteIndex(s,offset);
+		console.log("noteIndex:" + noteIndex);
 		var steps = halfStepsFromA(noteIndex, octave);
-
-		return steps;
+		console.log("steps:" + steps);
+		var HzNote = StepsToHzNote(steps);
+		return HzNote;
   }

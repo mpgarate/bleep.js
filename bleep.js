@@ -18,9 +18,9 @@ window.Bleep = (function() {
 			duration = 32;
 		}
 		if (typeof note === 'undefined'){
-			note = 'A';
+			note = "A";
 		}
-		var steps = stringToSteps(note, octave);
+		var HzNote = stringToHzNote(note, octave);
 
 		
 		var oscillator = context.createOscillator();
@@ -28,7 +28,7 @@ window.Bleep = (function() {
 		currentTime = context.currentTime;
 
 		//oscillator.connect(context.destination); // Connect to speakers
-    oscillator.frequency.value = parseFloat(StepsToHzNote(steps)); // in hertz
+    oscillator.frequency.value = parseFloat(HzNote); // in hertz
 		oscillator.connect(g);
     oscillator.start(0); // Start generating sound immediately
 		g.connect(context.destination);
