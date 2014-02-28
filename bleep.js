@@ -1,4 +1,4 @@
-context = new (window.AudioContext || window.webkitAudioContext);
+context = new window.AudioContext;
 
 window.Bleep = (function() {
 	var Bleep = function(){};
@@ -41,7 +41,7 @@ window.Bleep = (function() {
   		note = noteQueue.shift();
 
 			var o = context.createOscillator();
-			var g = context.createGainNode();
+			var g = context.createGain();
 
 			o.connect(g);
 			g.connect(context.destination);
