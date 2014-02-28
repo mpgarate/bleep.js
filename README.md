@@ -5,6 +5,8 @@ Retro tones in js, one note at a time.
 
 With Bleep, notes are appended to an asynchronous playback queue. This allows composing scores directly in javascript. 
 
+Bleep depends on AudioContext or webkitAudioContext, currently only available in Chrome and (untested) Safari.
+
 Basic usage
 -----------
 
