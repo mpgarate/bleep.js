@@ -69,6 +69,7 @@ $( document ).ready(function() { /*
     Bleep.tone("E4");
     Bleep.setWaveform("square");
     Bleep.setbpm(60);
+    Bleep.rest(16);
     Bleep.tone("B4");
     Bleep.tone("C4");
     Bleep.tone("A4");

@@ -9,12 +9,13 @@ window.Bleep = (function() {
 
   var Settings = Bleep.settings = {
     waveform: "sine",
-    bpm: 120
+    bpm: 120,
+    master_volume: 1
   };
 
   Event.prototype.HzNote;   // note in Hertz, ready for oscillator
   Event.prototype.duration; // duration
-  Event.prototype.isNote;
+  Event.prototype.volume;
   Event.prototype.settingName;
   Event.prototype.settingVal;
   Event.prototype.isSetting;
@@ -34,7 +35,7 @@ window.Bleep = (function() {
     //note.durationMs = ((duration * 32) / (Settings.bpm / 60));
     note.duration = duration;
     console.log("duration: " + note.duration);
-    note.isNote = 1; // will generate at gain = 1
+    note.volume = 1; // will generate at gain = 1
     eventQueue.push(note);
   }
 
@@ -44,7 +45,7 @@ window.Bleep = (function() {
     var rest = new Event();
     rest.HzNote = 0;
     rest.duration = duration;
-    rest.isNote = 0; // will generate at gain = 0
+    rest.volume = 0; // will generate at gain = 0
     eventQueue.push(rest);
   }
 
@@ -54,11 +55,10 @@ window.Bleep = (function() {
     var e;
 
     while(eventQueue.length > 0){
-    console.log("event:");
-    console.log(e);
+      console.log("event:");
+      console.log(e);
       e = eventQueue.shift();
       if (e.isSetting){
-        //Bleep.__updateSetting(e,playTime);
         Settings[e.settingName] = e.settingVal;
         continue;
       }
@@ -68,6 +68,8 @@ window.Bleep = (function() {
       var o = context.createOscillator();
       var g = context.createGain();
       o.type = Settings["waveform"];
+      e.volume = Bleep.__setVolumeForWaveformType(o,e);
+      console.log("made note vol: " + e.volume)
       o.connect(g);
       g.connect(context.destination);
       g.gain.value = 0;
@@ -81,9 +83,10 @@ window.Bleep = (function() {
   }
 
   // Play a note from the event queue
-  Bleep.__playNote = function(note, startTime, o, g, duration){
+  Bleep.__playNote = function(note, startTime, o, g, duration, master_volume){
     setTimeout(function(){
-      g.gain.value = note.isNote; // 0 or 1
+      g.gain.value = note.volume;
+      console.log("played at vol: " + note.volume);
     }, startTime);
 
     // fade note to prevent pop
@@ -105,19 +108,28 @@ window.Bleep = (function() {
     return ((60000) / (Settings.bpm * (d/4)));
   }
 
-  // Update a setting from a scheduled event
-  Bleep.__updateSetting = function(e,time){
-    setTimeout(function(){
-      Settings[e.settingName] = e.settingVal;
-      console.log("updated setting");
-      console.log(Settings);
-    },0);
+  // Adjust the volume for wave type variations
+  Bleep.__setVolumeForWaveformType = function(o,e){
+    switch(o.type){
+      case "sine" : 
+        return e.volume * 1;
+      break;
+      case "square":
+        return e.volume * 0.3;
+      break;
+      case "sawtooth":
+        return e.volume * 0.4;
+      break;
+      case "triangle":
+        return e.volume * 0.8;
+      break;
+    }
   }
 
   Bleep.setbpm = function(val){
     var e = new Event();
     e.isSetting = true;
-    e.isNote = 0;
+    e.volume = 0;
     e.duration = 0;
     e.settingName = "bpm";
     e.settingVal = val;
@@ -127,7 +139,7 @@ window.Bleep = (function() {
   Bleep.setWaveform = function(s){
     var e = new Event();
     e.isSetting = true;
-    e.isNote = 0;
+    e.volume = 0;
     e.duration = 0;
     e.settingName = "waveform";
     e.settingVal = s;
