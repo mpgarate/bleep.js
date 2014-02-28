@@ -26,26 +26,23 @@ $( document ).ready(function() { /*
   */
 
   $('.start-tone').click(function(){
-    Bleep.bpm = 120;
+    Bleep.setbpm(120);
 
     Bleep.tone("A4");
     Bleep.tone("A4");
-    Bleep.rest(8);
+    Bleep.setbpm(60);
     Bleep.tone("A4");
     Bleep.tone("A4");
-    Bleep.rest(32);
-    Bleep.tone("A4");
+    Bleep.setbpm(120);
     Bleep.tone("C4");
     Bleep.tone("D4");
-    Bleep.rest(1);
+    Bleep.setbpm(60);
     Bleep.tone("F4");
-    Bleep.rest(2);
     Bleep.tone("C4");
-    Bleep.rest(4);
+    Bleep.setbpm(120);
     Bleep.tone("G4");
-    Bleep.rest(8);
     Bleep.tone("E4");
-    Bleep.rest(16);
+    Bleep.setbpm(60);
     Bleep.tone("B4");
     Bleep.tone("C4");
     Bleep.tone("A4");

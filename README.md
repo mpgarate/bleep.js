@@ -70,17 +70,17 @@ Configure your Bleep
 Adjust these before calling arp, bloop, tone. 
 ~~~ js
 Bleep.setWaveform("sine"); // indicate sine, sqaure, sawtooth, triangle
-Bleep.bpm(120); // tempo in beats per minute
+Bleep.setbpm(120); // tempo in beats per minute
 ~~~
 
 These setting helpers are handled as events in the queue so you can change them throughout your composition:
 ~~~ js
-Bleep.bpm(120); // standard tempo
+Bleep.setbpm(120); // standard tempo
 Bleep.tone("A4");
 Bleep.tone("C4");
 Bleep.tone("D4");
 Bleep.tone("F4");
-Bleep.bpm(240); // double time!
+Bleep.setbpm(240); // double time!
 Bleep.tone("C4");
 Bleep.tone("G4");
 Bleep.tone("E4");

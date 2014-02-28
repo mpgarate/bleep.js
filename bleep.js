@@ -2,8 +2,8 @@ context = new window.AudioContext;
 
 window.Bleep = (function() {
 	var Bleep = function(){};
-	var Note = function(){};
-	var noteQueue = [];
+	var Event = function(){};
+	var eventQueue = [];
 
 	Bleep.version = "0.0.1";
 
@@ -12,9 +12,12 @@ window.Bleep = (function() {
 		bpm: 120
 	};
 
-	Note.prototype.HzNote;		// note in Hertz, ready for oscillator
-	Note.prototype.durationMs;	// duration in ms
-	Note.prototype.isNote;
+	Event.prototype.HzNote;		// note in Hertz, ready for oscillator
+	Event.prototype.duration;	// duration
+	Event.prototype.isNote;
+	Event.prototype.settingName;
+	Event.prototype.settingVal;
+	Event.prototype.isSetting;
 
 	// Play a tone
 	// note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
@@ -26,32 +29,41 @@ window.Bleep = (function() {
 		}
 		var HzNote = stringToHzNote(note, octave);
 		
-		var note = new Note();
+		var note = new Event();
 		note.HzNote = HzNote;
 		//note.durationMs = ((duration * 32) / (Settings.bpm / 60));
-		note.durationMs = Bleep.__durationToMs(duration);
-		console.log("duration: " + note.durationMs);
+		note.duration = duration;
+		console.log("duration: " + note.duration);
 		note.isNote = 1; // will generate at gain = 1
-		noteQueue.push(note);
+		eventQueue.push(note);
   }
 
 	// Play silence for a given duration.
 	// duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.rest = function(duration){
-  	var note = new Note();
-  	note.HzNote = 0;
-  	note.durationMs = Bleep.__durationToMs(duration);
-  	note.isNote = 0; // will generate at gain = 0
-		noteQueue.push(note);
+  	var rest = new Event();
+  	rest.HzNote = 0;
+  	rest.duration = duration;
+  	rest.isNote = 0; // will generate at gain = 0
+		eventQueue.push(rest);
   }
 
   // Begin processing event queue. Schedule notes and rests. 
   Bleep.start = function(){
   	var playTime = 0;
-  	var note;
+  	var e;
 
-  	while(noteQueue.length > 0){
-  		note = noteQueue.shift();
+  	while(eventQueue.length > 0){
+  	console.log("event:");
+		console.log(e);
+  		e = eventQueue.shift();
+  		if (e.isSetting){
+  			//Bleep.__updateSetting(e,playTime);
+  			Settings[e.settingName] = e.settingVal;
+  			continue;
+  		}
+
+  		var duration = Bleep.__durationToMs(e.duration);
 
 			var o = context.createOscillator();
 			var g = context.createGain();
@@ -59,38 +71,61 @@ window.Bleep = (function() {
 			o.connect(g);
 			g.connect(context.destination);
 			g.gain.value = 0;
-    	o.frequency.value = parseFloat(note.HzNote); 
+    	o.frequency.value = parseFloat(e.HzNote); 
 			o.start(0);
 
-  		Bleep.__playNote(note,playTime,o,g);
+  		Bleep.__playNote(e,playTime,o,g,duration);
 
-  		playTime += note.durationMs;
+  		playTime += duration;
   	}
   }
 
   // Play a note from the event queue
-  Bleep.__playNote = function(note, playTime, o, g){
+  Bleep.__playNote = function(note, startTime, o, g, duration){
   	setTimeout(function(){
 	    g.gain.value = note.isNote; // 0 or 1
-  	}, playTime);
+  	}, startTime);
 
 		// fade note to prevent pop
     setTimeout(function(){
 			g.gain.value = 0;
-    }, playTime + note.durationMs - 10);
+    }, startTime + duration - 10);
 
     // kill oscillator shortly after
     setTimeout(function(){
     	o.stop(0);
 	    o = null;
 	    g = null;
-    }, playTime + note.durationMs * 1.5);
+    }, startTime + duration * 1.5);
   }
 
   // Convert a duration to ms using current BPM
 	// duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.__durationToMs = function(d){
   	return ((60000) / (Settings.bpm * (d/4)));
+  }
+
+  // Update a setting from a scheduled event
+  Bleep.__updateSetting = function(e,time){
+  	setTimeout(function(){
+  		Settings[e.settingName] = e.settingVal;
+  		console.log("updated setting");
+  		console.log(Settings);
+  	},0);
+  }
+
+  Bleep.setbpm = function(val){
+  	var e = new Event();
+  	e.isSetting = true;
+  	e.isNote = 0;
+  	e.duration = 0;
+  	e.settingName = "bpm";
+  	e.settingVal = val;
+  	eventQueue.push(e);
+  }
+
+  Bleep.setWaveform = function(w){
+
   }
 
 
