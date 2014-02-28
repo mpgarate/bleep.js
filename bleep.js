@@ -14,25 +14,38 @@ window.Bleep = (function() {
 
 	Note.prototype.HzNote;		// note in Hertz, ready for oscillator
 	Note.prototype.durationMs;	// duration in ms
+	Note.prototype.isNote;
 
+	// Play a tone
 	// note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
-	// duration is in 32nd notes. 32 = 1 beat. 16 = 1/2 note. 8 = 1/4 note.
+	// duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
 	// octave is in MIDI standard, 0-8
 	Bleep.tone = function(note, duration, octave){
 		if (typeof duration === 'undefined'){
-			duration = 8;
+			duration = 16;
 		}
 		var HzNote = stringToHzNote(note, octave);
 		
 		var note = new Note();
 		note.HzNote = HzNote;
 		//note.durationMs = ((duration * 32) / (Settings.bpm / 60));
-		note.durationMs = ((60000) / (Settings.bpm * (duration/4)));
+		note.durationMs = Bleep.__durationToMs(duration);
 		console.log("duration: " + note.durationMs);
-
+		note.isNote = 1; // will generate at gain = 1
 		noteQueue.push(note);
   }
 
+	// Play silence for a given duration.
+	// duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
+  Bleep.rest = function(duration){
+  	var note = new Note();
+  	note.HzNote = 0;
+  	note.durationMs = Bleep.__durationToMs(duration);
+  	note.isNote = 0; // will generate at gain = 0
+		noteQueue.push(note);
+  }
+
+  // Begin processing event queue. Schedule notes and rests. 
   Bleep.start = function(){
   	var playTime = 0;
   	var note;
@@ -55,14 +68,14 @@ window.Bleep = (function() {
   	}
   }
 
+  // Play a note from the event queue
   Bleep.__playNote = function(note, playTime, o, g){
   	setTimeout(function(){
-	    g.gain.value = 1;
+	    g.gain.value = note.isNote; // 0 or 1
   	}, playTime);
 
 		// fade note to prevent pop
     setTimeout(function(){
-			//g.gain.setTargetAtTime(0, 0, 0.01);
 			g.gain.value = 0;
     }, playTime + note.durationMs - 10);
 
@@ -72,6 +85,12 @@ window.Bleep = (function() {
 	    o = null;
 	    g = null;
     }, playTime + note.durationMs * 1.5);
+  }
+
+  // Convert a duration to ms using current BPM
+	// duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
+  Bleep.__durationToMs = function(d){
+  	return ((60000) / (Settings.bpm * (d/4)));
   }
 
 
