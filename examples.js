@@ -26,9 +26,21 @@ $( document ).ready(function() { /*
   */
 
   $('.start-tone').click(function(){
-    var note = $('.note-input').val();
-    console.log(note);
-    Bleep.tone(note);
+    Bleep.bpm = 110;
+
+    Bleep.tone("A4");
+    Bleep.tone("C4");
+    Bleep.tone("D4");
+    Bleep.tone("F4");
+    Bleep.tone("C4");
+    Bleep.tone("G4");
+    Bleep.tone("E4");
+    Bleep.tone("B4");
+    Bleep.tone("C4");
+    Bleep.tone("A4");
+
+    Bleep.start();
+    
   });
 
   $('.note-link').click(function(){

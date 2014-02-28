@@ -2,6 +2,7 @@ context = new (window.AudioContext || window.webkitAudioContext);
 
 window.Bleep = (function() {
 	var Bleep = {};
+	var Queue = {};
 
 	Bleep.version = "0.0.1";
 
@@ -41,6 +42,22 @@ window.Bleep = (function() {
     }, waitTime * 1.5);
 
   }
+
+  Bleep.start = function(){
+  	playTime = 0;
+  	while(this.queue.length > 0){
+  		
+  	}
+  }
+
+  Queue.prototype.playNote(){
+		var waitTime =  duration * (Settings.bpm / 32);
+  	setTimeout(function()){
+
+  	}, time();
+  }
+
+
 
 	return Bleep;
 })();
