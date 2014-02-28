@@ -26,7 +26,15 @@ $( document ).ready(function() { /*
   */
 
   $('.start-tone').click(function(){
-    var note = $('.note-input').html();
+    var note = $('.note-input').val();
+    console.log(note);
+    Bleep.tone(note);
+  });
+
+  $('.note-link').click(function(){
+    var note = $(this).text();
+
+    console.log(note);
     Bleep.tone(note);
   });
 });

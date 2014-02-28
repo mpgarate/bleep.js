@@ -1,6 +1,4 @@
 context = new webkitAudioContext(),
-oscillator = context.createOscillator();
-oscillator.connect(context.destination); // Connect to speakers
 
 window.Bleep = (function() {
 	var Bleep = {};
@@ -11,6 +9,14 @@ window.Bleep = (function() {
 		waveform: "sine",
 		bpm: 120
 	};
+
+	context = new webkitAudioContext(),
+		o = context.createOscillator();
+		o.connect(context.destination); // Connect to speakers
+	//oscillator = context.createOscillator();
+	//oscillator.connect(context.destination); // Connect to speakers
+  //oscillator.frequency.value = 0; // in hertz
+  //oscillator.noteOn(0);
 
 	// note is a string like 'A' or 'A0'
 	// duration is in 32nd notes. 32 = 1 beat. 
@@ -49,10 +55,17 @@ window.Bleep = (function() {
 		var note_index = StringToNoteIndex(note,offset);
 		var steps = half_steps_from_a(note_index, octave);
 
+		
+		oscillator = context.createOscillator();
+		oscillator.connect(context.destination); // Connect to speakers
     oscillator.frequency.value = parseFloat(StepsToHzNote(steps)); // in hertz
     oscillator.start(0); // Start generating sound immediately
-    setTimeout(function(){oscillator.stop(0)}, (duration * (Settings.bpm/32)));
-    console.log(steps);
-	}
+
+    setTimeout(function(){
+    	oscillator.stop(0);
+    }, duration * (Settings.bpm / 32));
+    o.disconnect(0);
+  }
+
 	return Bleep;
 })();

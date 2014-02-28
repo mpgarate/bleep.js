@@ -1,7 +1,7 @@
 Bleep.js
 ############
 
-Retro groovesin js, one note at a time. 
+Retro tones in js, one note at a time. 
 
 When calling Bloop, notes are appended to an asynchronous playback queue. 
 
@@ -27,3 +27,4 @@ Bleep.bloopScoopDaWoop(); // Here be dragons
 // Adjust these before calling arp, bloop, tone
 Bleep.waveform = "sine"; // indicate sine, sqaure, etc. Custom waveforms on the wishlist.
 
+https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#dfn-OscillatorNode
