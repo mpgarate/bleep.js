@@ -8,7 +8,8 @@ window.Bleep = (function() {
 	Bleep.version = "0.0.1";
 
 	var Settings = Bleep.settings = {
-		waveform: "sine"
+		waveform: "sine",
+		bpm: 120
 	};
 
 	// note is a string like 'A' or 'A0'
@@ -50,6 +51,7 @@ window.Bleep = (function() {
 
     oscillator.frequency.value = parseFloat(StepsToHzNote(steps)); // in hertz
     oscillator.start(0); // Start generating sound immediately
+    setTimeout(function(){oscillator.stop(0)}, (duration * (Settings.bpm/32)));
     console.log(steps);
 	}
 	return Bleep;

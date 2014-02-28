@@ -26,6 +26,7 @@ $( document ).ready(function() { /*
   */
 
   $('.start-tone').click(function(){
-    Bleep.tone("D");
+    var note = $('.note-input').html();
+    Bleep.tone(note);
   });
 });
