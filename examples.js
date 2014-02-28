@@ -29,6 +29,10 @@ $( document ).ready(function() { /*
     Bleep.bpm = 110;
 
     Bleep.tone("A4");
+    Bleep.tone("A4");
+    Bleep.tone("A4");
+    Bleep.tone("A4");
+    Bleep.tone("A4");
     Bleep.tone("C4");
     Bleep.tone("D4");
     Bleep.tone("F4");
