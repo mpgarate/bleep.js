@@ -28,6 +28,11 @@ window.Bleep = (function() {
     if (typeof duration === 'undefined'){
       duration = 16;
     }
+    // Handle rest
+    if (note.charAt(0) === 'R'){
+      Bleep.rest(note.charAt(1));
+      return;
+    }
     var HzNote = stringToHzNote(note, octave);
     
     var note = new Event();

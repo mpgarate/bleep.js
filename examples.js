@@ -47,34 +47,11 @@ $( document ).ready(function() { /*
 */
 
   $('.start-tone').click(function(){
-    Bleep.setbpm(120);
-    Bleep.setWaveform("sine");
-    Bleep.tone("A4");
-    Bleep.tone("A4");
-    Bleep.setWaveform("square");
-    Bleep.setbpm(60);
-    Bleep.tone("A4");
-    Bleep.tone("A4");
-    Bleep.setWaveform("sawtooth");
-    Bleep.setbpm(120);
-    Bleep.tone("C4");
-    Bleep.tone("D4");
-    Bleep.setWaveform("triangle");
-    Bleep.setbpm(60);
-    Bleep.tone("F4");
-    Bleep.tone("C4");
-    Bleep.setWaveform("sawtooth");
-    Bleep.setbpm(120);
-    Bleep.tone("G4");
-    Bleep.tone("E4");
-    Bleep.setWaveform("square");
-    Bleep.setbpm(60);
-    Bleep.rest(16);
-    Bleep.tone("B4");
-    Bleep.tone("C4");
-    Bleep.tone("A4");
+    Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
+    Bleep.tone("A#2",16); //Bleep.tone(note, duration);
+    Bleep.tone("R8"); // also legal
+    Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
     Bleep.start();
-
   });
 
   $('.note-link').click(function(){
