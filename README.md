@@ -53,10 +53,10 @@ Play a custom sequence with `sequence()`
 ~~~ js
 // Formatted to one quarter measure per line
 var mySequence = [
-	"A4", "A5", "A4", "A5", // Four 16th notes
-	"R4", 									// rest for a quarter measure
-	"R8",       ["C4", 8]   // 8th rest and an eighth note
-	"E4"										// One quarter note
+  "A4", "A5", "A4", "A5", // Four 16th notes
+  "R4",                   // rest for a quarter measure
+  "R8",       ["C4", 8]   // 8th rest and an eighth note
+  "E4"                    // One quarter note
 ]
 Bleep.sequence(mySequence);
 ~~~
