@@ -19,6 +19,8 @@ You can also call `bloop()` with a fixed value of notes to play.
 Bleep.bloop(8);
 ~~~
 
+Composing Tunes
+-----------
 
 Generate your own arpeggio with `arp`
 ~~~ js
@@ -26,6 +28,16 @@ Bleep.arp("C", "Minor", 32, 120);
 Bleep.start();
 ~~~
 defaults: ```Bleep.arp(key = "Eb", scale = major, duration = 16 notes, tempo = 120, octave = 4)```
+
+
+Add a simple tone to the queue with `tone()`
+~~~ js
+Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
+Bleep.tone("A#2",16); //Bleep.tone(note, duration);
+Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
+Bleep.start();
+~~~
+
 
 Add a pause to the queue with `rest()`
 ~~~ js
@@ -36,13 +48,6 @@ Bleep.rest("R1"); // alternate syntax for whole note
 Bleep.tone("R8"); // also legal
 ~~~
 
-Add a simple tone to the queue with `tone()`
-~~~ js
-Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
-Bleep.tone("A#2",16); //Bleep.tone(note, duration);
-Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
-Bleep.start();
-~~~
 
 Play a custom sequence with `sequence()`
 ~~~ js
@@ -61,7 +66,7 @@ Bleep.sequence(mySequence);
 Bleep.bloopScoopDaWoop(); // Here be dragons
 ~~~
 
-Configure your Bleep
+Configure Bleep
 --------
 Adjust these before calling arp, bloop, tone. 
 ~~~ js
