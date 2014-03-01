@@ -1,8 +1,10 @@
-context = new window.AudioContext;
-
 window.Bleep = (function() {
+
   function Bleep(){};
   Bleep.version = "0.0.1";
+
+  // AudioContext instance used for sound generation
+  context = new window.AudioContext;
 
   // Event parent object
   function Event(){
@@ -38,7 +40,7 @@ window.Bleep = (function() {
   SettingEvent.prototype.constructor = SettingEvent;
 
   // Queue for handling events
-  var eventQueue = [];
+  var events = Bleep.events = [];
 
   var Settings = Bleep.settings = {
     bpm: 90,
@@ -64,7 +66,7 @@ window.Bleep = (function() {
     var HzNote = stringToHzNote(note, octave);
     
     var note = new NoteEvent(HzNote,duration);
-    eventQueue.push(note);
+    events.push(note);
 
     console.log("Pushed note to queue: ");
     console.log(note);
@@ -75,7 +77,7 @@ window.Bleep = (function() {
   Bleep.rest = function(arg){
     duration = Bleep.__restArgToDuration(arg);
     var rest = new RestEvent(duration);
-    eventQueue.push(rest);
+    events.push(rest);
 
     console.log("Pushed rest to queue: ");
     console.log(rest);
@@ -86,8 +88,8 @@ window.Bleep = (function() {
     var playTime = 0;
     var e;
 
-    while(eventQueue.length > 0){
-      e = eventQueue.shift();
+    while(events.length > 0){
+      e = events.shift();
       console.log("event:");
       console.log(e);
       if (e.isClass("SettingEvent")){
@@ -95,14 +97,11 @@ window.Bleep = (function() {
         continue;
       }
 
-      console.log(e);
       var duration = Bleep.__durationToMs(e.duration);
-      console.log("duration is: " + duration);
       var o = context.createOscillator();
       var g = context.createGain();
       o.type = Settings["waveform"];
       e.volume = Bleep.__setVolumeForWaveformType(o,e);
-      console.log("made note vol: " + e.volume)
       o.connect(g);
       g.connect(context.destination);
       g.gain.value = 0;
@@ -123,7 +122,7 @@ window.Bleep = (function() {
       g.gain.value = note.volume;
     }, startTime);
 
-    // fade note to prevent pop
+    // end note early to prevent pop
     setTimeout(function(){
       g.gain.value = 0;
       g = null;
@@ -174,14 +173,14 @@ window.Bleep = (function() {
     
     var e = new SettingEvent("bpm",val);
 
-    eventQueue.push(e);
+    events.push(e);
     console.log("Pushed bpm event to queue:");
     console.log(e);
   }
 
   Bleep.setWaveform = function(s){
     var e = new SettingEvent("waveform",s);
-    eventQueue.push(e);
+    events.push(e);
     console.log("Pushed waveform event to queue:");
     console.log(e);
   }
@@ -207,7 +206,7 @@ window.Bleep = (function() {
       note.duration = 32;
       note.volume = 1;
 
-      eventQueue.push(note);
+      events.push(note);
       console.log("Pushed bloop event to queue:");
       console.log(note);
 
@@ -218,4 +217,4 @@ window.Bleep = (function() {
 
 
   return Bleep;
-})();
+}());
