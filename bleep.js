@@ -39,15 +39,23 @@ window.Bleep = (function() {
   NoteEvent.prototype.constructor = NoteEvent;
   SettingEvent.prototype.constructor = SettingEvent;
 
-  // Queue for handling events
-  var events = Bleep.events = [];
-
   var Settings = Bleep.settings = {
     bpm: 90,
     default_note_length: 16,
     waveform: "sine",
     master_volume: 1
   };
+
+
+  // Queue for handling events
+  var events = Bleep.events = [];
+  var timeoutFunctions = [];
+
+  var clearTimeoutFunctions = function(){
+    for (var i = 0; i < timeoutFunctions.length; i++){
+      clearTimeout(timeoutFunctions[i]);
+    }
+  }
 
 
   // Play a tone
@@ -85,6 +93,9 @@ window.Bleep = (function() {
 
   // Begin processing event queue. Schedule notes and rests. 
   Bleep.start = function(){
+    // Stop any pending sounds from last call to start()
+    clearTimeoutFunctions();
+
     var playTime = 0;
     var e;
 
@@ -117,7 +128,7 @@ window.Bleep = (function() {
 
   // Play a note from the event queue
   Bleep.__playNote = function(note, startTime, o, g, duration, master_volume){
-    setTimeout(function(){
+    var t1 = setTimeout(function(){
       console.log(duration);
       g.gain.value = note.volume;
     }, startTime);
@@ -128,6 +139,9 @@ window.Bleep = (function() {
       g = null;
       o = null;
     }, startTime + duration - 10);
+
+    // store setTimeout functions to allow clearing
+    timeoutFunctions.push(t1);
   }
 
   // Convert a duration to ms using current BPM
