@@ -46,19 +46,26 @@ $( document ).ready(function() { /*
     Bleep.tone("A4");
 */
 
-  $('.start-tone').click(function(){
-    Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
+  $('.bloop').click(function(){
+    Bleep.bloop();
+    Bleep.start();
+  });
+  $('.bloop-8').click(function(){
+    Bleep.bloop(8);
+    Bleep.start();
+  });
+  $('.arp').click(function(){
+    //Bleep.arp("C", "Minor", 32, 120); 
+    //Bleep.start();
+  });
+  $('.tone-rest').click(function(){
+    Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th noteBleep.rest(8); // will rest for length of 8th note
+    Bleep.rest(1); // will rest for length of whole note
+    Bleep.rest("R16"); // alternate syntax for 8th note
     Bleep.tone("A#2",16); //Bleep.tone(note, duration);
-    Bleep.tone("R8"); // also legal
+    Bleep.rest("R32"); // alternate syntax for whole note
     Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
     Bleep.start();
   });
 
-  $('.note-link').click(function(){
-    var note = $(this).text();
-
-    console.log(note);
-    Bleep.tone(note);
-    Bleep.start();
-  });
 });

@@ -1,24 +1,52 @@
 context = new window.AudioContext;
 
 window.Bleep = (function() {
-  var Bleep = function(){};
-  var Event = function(){};
-  var eventQueue = [];
-
+  function Bleep(){};
   Bleep.version = "0.0.1";
 
+  // Event parent object
+  function Event(){
+    this.duration;
+    this.volume;
+  }
+  
+  // Event Object for rests, pauses in music playback
+  function RestEvent(duration){
+    this.duration = duration;
+    this.volume = 0;
+  }
+
+  // Event Object for notes in music playback
+  function NoteEvent(HzNote,duration){
+    this.HzNote = HzNote;
+    this.duration = duration;
+    this.volume = 1;
+  }
+
+  // Event Object for setting adjustment
+  function SettingEvent(name,val){
+    this.settingName = name;
+    this.settingVal = val;
+  }
+
+  // Define inheritance and constructors
+  RestEvent.prototype = new Event();
+  NoteEvent.prototype = new Event();
+  SettingEvent.prototype = new Event();
+  RestEvent.prototype.constructor = RestEvent;
+  NoteEvent.prototype.constructor = NoteEvent;
+  SettingEvent.prototype.constructor = SettingEvent;
+
+  // Queue for handling events
+  var eventQueue = [];
+
   var Settings = Bleep.settings = {
+    bpm: 90,
+    default_note_length: 16,
     waveform: "sine",
-    bpm: 120,
     master_volume: 1
   };
 
-  Event.prototype.HzNote;   // note in Hertz, ready for oscillator
-  Event.prototype.duration; // duration
-  Event.prototype.volume;
-  Event.prototype.settingName;
-  Event.prototype.settingVal;
-  Event.prototype.isSetting;
 
   // Play a tone
   // note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
@@ -26,7 +54,7 @@ window.Bleep = (function() {
   // octave is in MIDI standard, 0-8
   Bleep.tone = function(note, duration, octave){
     if (typeof duration === 'undefined'){
-      duration = 16;
+      duration = Settings["default_note_length"];
     }
     // Handle rest
     if (note.charAt(0) === 'R'){
@@ -35,23 +63,22 @@ window.Bleep = (function() {
     }
     var HzNote = stringToHzNote(note, octave);
     
-    var note = new Event();
-    note.HzNote = HzNote;
-    //note.durationMs = ((duration * 32) / (Settings.bpm / 60));
-    note.duration = duration;
-    console.log("duration: " + note.duration);
-    note.volume = 1; // will generate at gain = 1
+    var note = new NoteEvent(HzNote,duration);
     eventQueue.push(note);
+
+    console.log("Pushed note to queue: ");
+    console.log(note);
   }
 
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
-  Bleep.rest = function(duration){
-    var rest = new Event();
-    rest.HzNote = 0;
-    rest.duration = duration;
-    rest.volume = 0; // will generate at gain = 0
+  Bleep.rest = function(arg){
+    duration = Bleep.__restArgToDuration(arg);
+    var rest = new RestEvent(duration);
     eventQueue.push(rest);
+
+    console.log("Pushed rest to queue: ");
+    console.log(rest);
   }
 
   // Begin processing event queue. Schedule notes and rests. 
@@ -60,16 +87,17 @@ window.Bleep = (function() {
     var e;
 
     while(eventQueue.length > 0){
+      e = eventQueue.shift();
       console.log("event:");
       console.log(e);
-      e = eventQueue.shift();
-      if (e.isSetting){
+      if (e.isClass("SettingEvent")){
         Settings[e.settingName] = e.settingVal;
         continue;
       }
 
+      console.log(e);
       var duration = Bleep.__durationToMs(e.duration);
-
+      console.log("duration is: " + duration);
       var o = context.createOscillator();
       var g = context.createGain();
       o.type = Settings["waveform"];
@@ -81,6 +109,7 @@ window.Bleep = (function() {
       o.frequency.value = parseFloat(e.HzNote); 
       o.start(0);
 
+      console.log(g);
       Bleep.__playNote(e,playTime,o,g,duration);
 
       playTime += duration;
@@ -90,21 +119,16 @@ window.Bleep = (function() {
   // Play a note from the event queue
   Bleep.__playNote = function(note, startTime, o, g, duration, master_volume){
     setTimeout(function(){
+      console.log(duration);
       g.gain.value = note.volume;
-      console.log("played at vol: " + note.volume);
     }, startTime);
 
     // fade note to prevent pop
     setTimeout(function(){
       g.gain.value = 0;
-    }, startTime + duration - 10);
-
-    // kill oscillator shortly after
-    setTimeout(function(){
-      o.stop(0);
-      o = null;
       g = null;
-    }, startTime + duration * 1.5);
+      o = null;
+    }, startTime + duration - 10);
   }
 
   // Convert a duration to ms using current BPM
@@ -131,24 +155,64 @@ window.Bleep = (function() {
     }
   }
 
+  Bleep.__restArgToDuration = function(arg){
+    if (typeof arg === 'undefined'){
+      return Settings["default_note_length"];
+    }
+    else if (typeof arg === "number"){
+      return Number(arg);
+    }
+    else if (arg.charAt(0) === 'R'){
+      return Number(arg.charAt(1));
+    }
+    else {
+      throw "Invalid rest parameter"
+    }
+  }
+
   Bleep.setbpm = function(val){
-    var e = new Event();
-    e.isSetting = true;
-    e.volume = 0;
-    e.duration = 0;
-    e.settingName = "bpm";
-    e.settingVal = val;
+    
+    var e = new SettingEvent("bpm",val);
+
     eventQueue.push(e);
+    console.log("Pushed bpm event to queue:");
+    console.log(e);
   }
 
   Bleep.setWaveform = function(s){
-    var e = new Event();
-    e.isSetting = true;
-    e.volume = 0;
-    e.duration = 0;
-    e.settingName = "waveform";
-    e.settingVal = s;
+    var e = new SettingEvent("waveform",s);
     eventQueue.push(e);
+    console.log("Pushed waveform event to queue:");
+    console.log(e);
+  }
+
+  Bleep.bloop = function(notes){
+    var notes_remaining, root_note,scale,note_val, note;
+    if (typeof notes === 'undefined'){
+      notes = 6;
+    }
+    notes_remaining = notes;
+    root_note = getRandomArbitrary(0,12);
+    scale = getMinorScale(root_note);
+
+  while(notes_remaining > 0){
+    note = new NoteEvent();
+    if ((notes_remaining > 1) && notes_remaining !== notes){
+      note_val = scale[getRandomArbitrary(0,scale.length)];
+      note.HzNote = StepsToHzNote(halfStepsFromA(note_val,4));
+    }
+    else{
+      note.HzNote = StepsToHzNote(halfStepsFromA(root_note,4));
+    }
+      note.duration = 32;
+      note.volume = 1;
+
+      eventQueue.push(note);
+      console.log("Pushed bloop event to queue:");
+      console.log(note);
+
+      notes_remaining--;
+    }
   }
 
 

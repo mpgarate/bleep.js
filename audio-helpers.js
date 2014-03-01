@@ -2,7 +2,6 @@
 // to a Hz value suitable for an oscillator
 var StepsToHzNote = function(halfSteps){
   var value = Math.pow(1.059460646483, halfSteps) * 440;
-  console.log("Hz:" + value);
   return value;
 }
 
@@ -94,4 +93,31 @@ var stringToHzNote = function(s,octave){
   var steps = halfStepsFromA(noteIndex, octave);
   var HzNote = StepsToHzNote(steps);
   return HzNote;
+}
+
+// Returns a random number between min and max
+function getRandomArbitrary(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
+}
+
+function getWrapped(index,max){
+  if(index > max){
+    index -= max;
+  }
+  return index;
+}
+
+function getMinorScale(root){
+  var scale = [0,2,3,5,7,8,10];
+
+  for(var i = 0; i < scale.length; i++){
+    scale[i] = getWrapped((scale[i] + root), 11);
+  }
+
+  return scale;
+}
+
+Object.prototype.isClass = function(obj, type) {
+    var clas = Object.prototype.toString.call(obj).slice(8, -1);
+    return obj !== undefined && obj !== null && clas === type;
 }
