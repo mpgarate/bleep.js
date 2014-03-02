@@ -53,16 +53,32 @@ $( document ).ready(function() { /*
 
   $('.bloop-params-fn').click(function(){
     var params = {
-    key: "C",           // default: "A"
-    scale: "major",     // default: "minor"
-    notes: 32,          // default: 8
-    duration: 8,        // default: 16
-    tempo: 90,          // default: 120
-    octave: 4,          // default: 4
-    octave_range: 2     // default: 1
-  }
+      key: "C",           // default: "A"
+      scale: "major",     // default: "minor"
+      notes: 32,          // default: 8
+      duration: 8,        // default: 16
+      tempo: 90,          // default: 120
+      octave: 4,          // default: 4
+      octave_range: 2     // default: 1
+    }
 
-  Bleep.bloop(params);
+    Bleep.bloop(params);
+  });
+
+  $('.arp-fn').click(function(){
+    var params = {
+      direction: "down",  // default: "up"
+    }
+
+    Bleep.arp(params); 
+    Bleep.start();
+  });
+
+  $('.tone-fn').click(function(){
+    Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
+    Bleep.tone("A#2",16); //Bleep.tone(note, duration);
+    Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
+    Bleep.start();
   });
 
 

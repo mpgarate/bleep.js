@@ -54,11 +54,11 @@
           <p><a href="#" class="btn btn-large btn-success bloop-fn">Run code</a></p>
           <br />
           <p>lorem ipsum dolor sit amet</p>
-
           <hr />
+        <!-- End Code Block -->
+
 
         <!-- Code Block -->
-          <h4><strong>bloop() with params</strong></h4>
 <pre>
 var params = {
   key: "C",           // default: "A"
@@ -73,16 +73,47 @@ var params = {
 Bleep.bloop(params);
 </pre>
 
-          <p><a href="#" class="btn btn-large btn-success bloop-params-fn">Run code</a></p>
-        </div>
+          <p><a href="javascript:;" class="btn btn-large btn-success bloop-params-fn">Run code</a></p>
+          <hr />
+        <!-- End Code Block -->
 
+
+        <!-- Code Block -->
+<pre>
+var params = {
+  direction: "down",  // default: "up"
+}
+
+Bleep.arp(params); 
+Bleep.start();
+</pre>
+          <p><a href="javascript:;" class="btn btn-large btn-success arp-fn">Run code</a></p>
+          <hr />
+        <!-- End Code Block -->
+
+
+        <!-- Code Block -->
+<pre>
+Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
+Bleep.tone("A#2",16); //Bleep.tone(note, duration);
+Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
+Bleep.start();
+</pre>
+          <p><a href="javascript:;" class="btn btn-large btn-success tone-fn">Run code</a></p>
+          <hr />
+        <!-- End Code Block -->
+
+
+        </div> <!-- /col-sm-7 -->
         <!-- sidebar -->
         <div class="col-sm-4">
           <div class="sidebar">
             <ul class="list-group">
               <li class="list-group-item">Event queue is empty. </li>
             </ul>
+          </div>
         </div>
+
       </div><!-- /row -->
 
     </div> <!-- /container -->
@@ -91,7 +122,6 @@ Bleep.bloop(params);
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="jquery-2.1.0.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="bs/js/bootstrap.min.js"></script>
     <script src="../inc/AudioContextMonkeyPatch.js"></script>
     <script src="../audio-helpers.js"></script>
     <script src="../bleep.js"></script>
