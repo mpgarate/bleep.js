@@ -50,7 +50,10 @@
         <div class="col-sm-7">
 
         <!-- Code Block -->
-          <pre>Bleep.bloop();</pre>
+<pre>
+Bleep.bloop();
+Bleep.start();
+</pre>
           <p><a href="#" class="btn btn-large btn-success bloop-fn">Run code</a></p>
           <br />
           <p>lorem ipsum dolor sit amet</p>
@@ -61,16 +64,19 @@
         <!-- Code Block -->
 <pre>
 var params = {
-  key: "C",           // default: "A"
-  scale: "major",     // default: "minor"
-  notes: 32,          // default: 8
-  duration: 8,        // default: 16
-  tempo: 90,          // default: 120
-  octave: 4,          // default: 4
+  root_note: "C",           // default: randomize
+
+  // possible scales: "minor", "major", "pentatonic", "blues"
+  scale: "blues",     // default: "minor"
+  notes: 32,          // default: 6
+  note_length: 8,        // default: 16
+  bpm: 90,          // default: 120
+  octave: 3,          // default: 4
   octave_range: 2     // default: 1
 }
 
 Bleep.bloop(params);
+Bleep.start();
 </pre>
 
           <p><a href="javascript:;" class="btn btn-large btn-success bloop-params-fn">Run code</a></p>
@@ -94,9 +100,9 @@ Bleep.start();
 
         <!-- Code Block -->
 <pre>
-Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
-Bleep.tone("A#5",16); //Bleep.tone(note, duration);
-Bleep.tone("F", 2, 4); //Bleep.tone(note, duration, octave);
+Bleep.tone("C4");       // default note_length: 16th note
+Bleep.tone("A#5",16);   // Bleep.tone(note, note_length);
+Bleep.tone("F", 2, 4);  // Bleep.tone(note, note_length, octave);
 </pre>
           <p><a href="javascript:;" class="btn btn-large btn-success tone-fn">Run code</a></p>
           <hr />
@@ -106,8 +112,11 @@ Bleep.tone("F", 2, 4); //Bleep.tone(note, duration, octave);
         </div> <!-- /col-sm-7 -->
         <!-- sidebar -->
         <div class="col-sm-4">
-          <div class="sidebar">
-            <ul class="list-group">
+          <div class="sidebar pull-right">
+          <p>
+          <a href="javascript:;" class="btn btn-danger stop">Silence</a>
+          </p>
+            <ul class="list-group pull-right">
               <li class="list-group-item">Event queue is empty. </li>
             </ul>
           </div>

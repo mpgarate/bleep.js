@@ -59,9 +59,8 @@ var charToNoteIndex = function(s, offset){
 }
 
 // Parse an input string like 'A' or 'B0'
-// or 'C#4' or 'Db6' into a HzNote suitable
-// for an oscillator object
-var stringToHzNote = function(s,octave){
+// or 'C#4' or 'Db6' into a distance from A in half steps
+var stringToStepsFromA = function(s,octave){
   var offset = 0, steps, HzNote; // handle sharp or flat
   if (typeof s === 'undefined' || s === ''){
     s = 'A';
@@ -91,8 +90,12 @@ var stringToHzNote = function(s,octave){
 
   var noteIndex = charToNoteIndex(s,offset);
   var steps = halfStepsFromA(noteIndex, octave);
-  var HzNote = StepsToHzNote(steps);
-  return HzNote;
+  return steps;
+}
+// into a HzNote suitable
+// for an oscillator object
+function stringToHzNote(s,octave){
+  return StepsToHzNote(stringToStepsFromA(s,octave));
 }
 
 // Returns a random number between min and max
@@ -107,17 +110,18 @@ function getWrapped(index,max){
   return index;
 }
 
-function getMinorScale(root){
-  var scale = [0,2,3,5,7,8,10];
+function getScale(type,root){
+  var types = {
+    "minor": [0,2,3,5,7,8,10],
+    "major": [0,2,4,5,7,9,10],
+    "pentatonic": [0,3,5,7,10],
+    "blues": [0,3,5,6,7,10]
+  }
+  var scale = types[type];
 
   for(var i = 0; i < scale.length; i++){
     scale[i] = getWrapped((scale[i] + root), 11);
   }
 
   return scale;
-}
-
-Object.prototype.isClass = function(obj, type) {
-    var clas = Object.prototype.toString.call(obj).slice(8, -1);
-    return obj !== undefined && obj !== null && clas === type;
 }

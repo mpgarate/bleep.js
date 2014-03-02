@@ -8,20 +8,19 @@ window.Bleep = (function() {
 
   // Event parent object
   function Event(){
-    this.duration;
-    this.volume;
+    this.note_length;
   }
   
   // Event Object for rests, pauses in music playback
-  function RestEvent(duration){
-    this.duration = duration;
+  function RestEvent(note_length){
+    this.note_length = note_length;
     this.volume = 0;
   }
 
   // Event Object for notes in music playback
-  function NoteEvent(HzNote,duration){
+  function NoteEvent(HzNote,note_length){
     this.HzNote = HzNote;
-    this.duration = duration;
+    this.note_length = note_length;
     this.volume = 1;
   }
 
@@ -60,11 +59,11 @@ window.Bleep = (function() {
 
   // Play a tone
   // note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
-  // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
+  // note_length: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   // octave is in MIDI standard, 0-8
-  Bleep.tone = function(noteString, duration, octave){
-    if (typeof duration === 'undefined'){
-      duration = Settings["default_note_length"];
+  Bleep.tone = function(noteString, note_length, octave){
+    if (typeof note_length === 'undefined'){
+      note_length = Settings.default_note_length;
     }
     // Handle rest
     if (noteString.charAt(0) === 'R'){
@@ -73,7 +72,7 @@ window.Bleep = (function() {
     }
     var HzNote = stringToHzNote(noteString, octave);
     
-    var note = new NoteEvent(HzNote,duration);
+    var note = new NoteEvent(HzNote,note_length);
     events.push(note);
 
     console.log("Pushed note to queue: " + noteString);
@@ -83,8 +82,8 @@ window.Bleep = (function() {
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.rest = function(restString){
-    duration = Bleep.__restArgToDuration(restString);
-    var rest = new RestEvent(duration);
+    rest_note_length = Bleep.__restArgToDuration(restString);
+    var rest = new RestEvent(rest_note_length);
     events.push(rest);
 
     console.log("Pushed rest to queue: " + restString);
@@ -94,7 +93,7 @@ window.Bleep = (function() {
   // Begin processing event queue. Schedule notes and rests. 
   Bleep.start = function(){
     // Stop any pending sounds from last call to start()
-    clearTimeoutFunctions();
+    Bleep.stop();
 
     var playTime = 0;
     var e;
@@ -103,15 +102,19 @@ window.Bleep = (function() {
       e = events.shift();
       console.log("event:");
       console.log(e);
-      if (e.isClass("SettingEvent")){
+      if (e.constructor.name === "SettingEvent"){
         Settings[e.settingName] = e.settingVal;
+        console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
         continue;
       }
+      else{
+        console.log(e.constructor.name + " is not a setting");
+      }
 
-      var duration = Bleep.__durationToMs(e.duration);
+      var duration = Bleep.__noteLengthToMs(e.note_length);
       var o = context.createOscillator();
       var g = context.createGain();
-      o.type = Settings["waveform"];
+      o.type = Settings.waveform;
       e.volume = Bleep.__setVolumeForWaveformType(o,e);
       o.connect(g);
       g.connect(context.destination);
@@ -124,6 +127,10 @@ window.Bleep = (function() {
 
       playTime += duration;
     }
+  }
+
+  Bleep.stop = function(){
+    clearTimeoutFunctions();
   }
 
   // Play a note from the event queue
@@ -146,7 +153,7 @@ window.Bleep = (function() {
 
   // Convert a duration to ms using current BPM
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
-  Bleep.__durationToMs = function(d){
+  Bleep.__noteLengthToMs = function(d){
     return ((60000) / (Settings.bpm * (d/4)));
   }
 
@@ -170,7 +177,7 @@ window.Bleep = (function() {
 
   Bleep.__restArgToDuration = function(arg){
     if (typeof arg === 'undefined'){
-      return Settings["default_note_length"];
+      return Settings.default_note_length;
     }
     else if (typeof arg === "number"){
       return Number(arg);
@@ -204,37 +211,58 @@ window.Bleep = (function() {
     console.log(e);
   }
 
-  Bleep.bloop = function(notes){
-    var notes_remaining, root_note, scale, note_val, note;
-    if (typeof notes === 'undefined'){
-      notes = 6;
-    }
-    notes_remaining = notes;
-    root_note = getRandomArbitrary(0,12);
-    scale = getMinorScale(root_note);
+  Bleep.bloop = function(params){
+    var notes_remaining, scale, note_val, note, octave, tempoEvent, HzNote;
+    params = setBloopParams(params);
 
-  while(notes_remaining > 0){
-    note = new NoteEvent();
-    if ((notes_remaining > 1) && notes_remaining !== notes){
-      note_val = scale[getRandomArbitrary(0,scale.length)];
-      note.HzNote = StepsToHzNote(halfStepsFromA(note_val,4));
-    }
-    else{
-      note.HzNote = StepsToHzNote(halfStepsFromA(root_note,4));
-    }
-      note.duration = 32;
-      note.volume = 1;
+    Bleep.setbpm(params.bpm);
+
+    scale = getScale(params.scale,params.root_note);
+
+    for (var i = 0; i < params.notes; i++){
+      if (i < params.notes - 1){
+        note_val = scale[getRandomArbitrary(0,scale.length)];
+        octave = params.octave + getRandomArbitrary(0,params.octave_range);
+        HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
+      }
+      // Always end on the root note of the scale
+      else{
+        HzNote = StepsToHzNote(halfStepsFromA(params.root_note,4));
+      }
+      
+      note = new NoteEvent(HzNote, params.note_length);
 
       events.push(note);
-      console.log("Pushed bloop event to queue:");
-      console.log(note);
-
-      notes_remaining--;
     }
   }
 
   Bleep.arp = function(args){
 
+  }
+  function setBloopParams(params){
+    // default params
+    var dp = {
+      root_note: getRandomArbitrary(0,12),
+      notes: 6,
+      scale: "minor",
+      note_length: 32,
+      bpm: Settings.bpm,
+      octave_range: 1,
+      octave: 4
+    }
+    if (typeof params === 'undefined'){
+      var params;
+    }
+    for(var p in params){
+      dp[p] = params[p];
+    }
+
+    console.log(typeof dp.root_note);
+    if(typeof dp.root_note !== "number"){
+      dp.root_note = stringToStepsFromA(dp.root_note)
+    }
+
+    return dp;
   }
 
 

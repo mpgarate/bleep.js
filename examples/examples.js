@@ -51,18 +51,23 @@ $( document ).ready(function() { /*
     Bleep.start();
   });
 
+  $('.stop').click(function(){
+    Bleep.stop();
+  });
+
   $('.bloop-params-fn').click(function(){
     var params = {
-      key: "C",           // default: "A"
-      scale: "major",     // default: "minor"
+      root_note: "C",
+      scale: "blues",     // options: "minor" (default), "major", "pentatonic", "blues"
       notes: 32,          // default: 8
-      duration: 8,        // default: 16
-      tempo: 90,          // default: 120
-      octave: 4,          // default: 4
+      note_length: 8,        // default: 16
+      bpm: 90,          // default: 120
+      octave: 3,          // default: 4
       octave_range: 2     // default: 1
     }
 
     Bleep.bloop(params);
+    Bleep.start();
   });
 
   $('.arp-fn').click(function(){
@@ -78,8 +83,17 @@ $( document ).ready(function() { /*
     Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
     Bleep.tone("A#5",16); //Bleep.tone(note, duration);
     Bleep.tone("F", 2, 4); //Bleep.tone(note, duration, octave);
+    draw_events();
     Bleep.start();
   });
 
+
+  var draw_events = function(){
+    var events = Bleep.events;
+    var sidebar = $('.sidebar');
+    for (var i = 0; i < events.length; i++){
+      sidebar.append(events[i]);
+    }
+  }
 
 });
