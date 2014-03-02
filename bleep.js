@@ -176,7 +176,12 @@ window.Bleep = (function() {
       return Number(arg);
     }
     else if (arg.charAt(0) === 'R'){
-      return Number(arg.charAt(1));
+      if (arg.length === 3 ){
+        return arg.substring(1,3);
+      }
+      else{
+        return Number(arg.charAt(1));
+      }
     }
     else {
       throw "Invalid rest parameter"
@@ -200,7 +205,7 @@ window.Bleep = (function() {
   }
 
   Bleep.bloop = function(notes){
-    var notes_remaining, root_note,scale,note_val, note;
+    var notes_remaining, root_note, scale, note_val, note;
     if (typeof notes === 'undefined'){
       notes = 6;
     }
@@ -228,6 +233,9 @@ window.Bleep = (function() {
     }
   }
 
+  Bleep.arp = function(args){
+
+  }
 
 
   return Bleep;
