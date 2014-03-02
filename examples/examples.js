@@ -58,7 +58,7 @@ $( document ).ready(function() { /*
   $('.bloop-params-fn').click(function(){
     var params = {
       root_note: "C",
-      scale: "blues",     // options: "minor" (default), "major", "pentatonic", "blues"
+      scale_type: "blues",     // options: "minor" (default), "major", "pentatonic", "blues"
       notes: 32,          // default: 8
       note_length: 8,        // default: 16
       bpm: 90,          // default: 120

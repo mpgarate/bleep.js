@@ -104,8 +104,12 @@ function getRandomArbitrary(min, max) {
 }
 
 function getWrapped(index,max){
+  console.log("getting wrapped " + index + " in " + max);
   if(index > max){
     index -= max;
+  }
+  else if (index < 0){
+    index = max % index;
   }
   return index;
 }

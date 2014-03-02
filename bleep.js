@@ -212,7 +212,7 @@ window.Bleep = (function() {
   }
 
   Bleep.bloop = function(params){
-    var notes_remaining, scale, note_val, note, octave, tempoEvent, HzNote;
+    var scale, note_val, note, octave, HzNote;
     params = setBloopParams(params);
 
     Bleep.setbpm(params.bpm);
@@ -236,29 +236,80 @@ window.Bleep = (function() {
     }
   }
 
-  Bleep.arp = function(args){
-
-  }
   function setBloopParams(params){
     // default params
     var dp = {
       root_note: getRandomArbitrary(0,12),
       notes: 6,
-      scale: "minor",
+      scale_type: "minor",
       note_length: 32,
       bpm: Settings.bpm,
       octave_range: 1,
       octave: 4
     }
+
+    return setFooParams(params,dp);
+  }
+
+  Bleep.arp = function(params){
+
+    var note_val, note, octave, HzNote;
+    params = setArpParams(params);
+
+    Bleep.setbpm(params.bpm);
+
+    params.scale = getScale(params.scale_type,params.root_note);
+
+    for (var i = 0; i < params.notes; i++){
+      note_val = params.scale[getNextNote(i, params)];
+      octave = params.octave + (params.octave_range - 1);
+      HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
+      note = new NoteEvent(HzNote, params.note_length);
+
+      events.push(note);
+    }
+  }
+
+  function getNextNote(i, params){
+    var goingUp = false;
+
+    if (params.direction === "up"){
+      goingUp = true;
+    }
+    if(goingUp){
+      return (i + 1) % params.scale.length;
+    }
+    else {
+      return (params.notes - i) % params.scale.length;
+    }
+  }
+
+  function setArpParams(params){
+    // default params
+    var dp = {
+      root_note: "A",
+      notes: 20,
+      scale_type: "minor",
+      note_length: 32,
+      bpm: Settings.bpm,
+      octave_range: 1,
+      octave: 4,
+      direction: "up"
+    }
+
+    return setFooParams(params, dp);
+  }
+
+  function setFooParams(params,dp){
     if (typeof params === 'undefined'){
       var params;
     }
+
     for(var p in params){
       dp[p] = params[p];
     }
 
-    console.log(typeof dp.root_note);
-    if(typeof dp.root_note !== "number"){
+    if(typeof dp.root_note === "string"){
       dp.root_note = stringToStepsFromA(dp.root_note)
     }
 
