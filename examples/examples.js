@@ -93,8 +93,8 @@ $( document ).ready(function() { /*
     var mySequence = [
       "A4", "A5", "A4", "A5", // Four 16th notes
       "R4",                   // rest for a quarter measure
-      "R8",       ["C4", 8],   // 8th rest and an eighth note
-      "E4"                    // One quarter note
+      "R8",       ["C4", 8],  // 8th rest and an eighth note
+      ["E4", 4]               // One quarter note
     ]
     Bleep.sequence(mySequence);
     Bleep.start();
