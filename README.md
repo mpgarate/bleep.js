@@ -14,20 +14,33 @@ Calling `bloop()` generates a short, pleasing retro arp sound.
 ~~~ js
 Bleep.bloop();
 ~~~
-You can also call `bloop()` with a fixed value of notes to play.
+You can also call `bloop()` with a hash of parameters.
 ~~~ js
+var params = {
+  key: "C",           // default: "A"
+  scale: "major",     // default: "minor"
+  notes: 32,          // default: 8
+  duration: 8,        // default: 16
+  tempo: 90,          // default: 120
+  octave: 4,          // default: 4
+  octave_range: 2     // default: 1
+}
+
 Bleep.bloop(8);
 ~~~
 
 Composing Tunes
 -----------
 
-Generate your own arpeggio with `arp`
+Generate your own arpeggio with `arp` by passing a hash with optional parameters as above, with additional `direction` setting.
 ~~~ js
-Bleep.arp("C", "Minor", 32, 120); 
+var params = {
+  direction: "down",  // default: "up"
+}
+              
+Bleep.arp(params); 
 Bleep.start();
 ~~~
-defaults: ```Bleep.arp(key = "Eb", scale = major, duration = 16 notes, tempo = 120, octave = 4)```
 
 
 Add a simple tone to the queue with `tone()`
