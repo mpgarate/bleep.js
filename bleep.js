@@ -107,9 +107,6 @@ window.Bleep = (function() {
         console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
         continue;
       }
-      else{
-        console.log(e.constructor.name + " is not a setting");
-      }
 
       var duration = Bleep.__noteLengthToMs(e.note_length);
       var o = context.createOscillator();
@@ -217,7 +214,7 @@ window.Bleep = (function() {
 
     Bleep.setbpm(params.bpm);
 
-    scale = getScale(params.scale,params.root_note);
+    scale = getScale(params.scale_type,params.root_note);
 
     for (var i = 0; i < params.notes; i++){
       if (i < params.notes - 1){
@@ -252,35 +249,55 @@ window.Bleep = (function() {
   }
 
   Bleep.arp = function(params){
+    var note_val, note, octave, HzNote, direction_val, scale;
+    var change_octave_at;
 
-    var note_val, note, octave, HzNote;
     params = setArpParams(params);
 
     Bleep.setbpm(params.bpm);
 
     params.scale = getScale(params.scale_type,params.root_note);
 
-    for (var i = 0; i < params.notes; i++){
-      note_val = params.scale[getNextNote(i, params)];
-      octave = params.octave + (params.octave_range - 1);
-      HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
-      note = new NoteEvent(HzNote, params.note_length);
+    octave = params.octave;
+    scale = params.scale;
 
+    if(params.direction === "up"){
+      direction_val = 1;
+      last_note_in_octave = 0;
+    }
+    else{
+      direction_val = -1;
+      last_note_in_octave = scale.length -1;
+    }
+
+    for (var i = 0; i < params.notes; i++){
+      note_val = scale[getNextNote(i, params)];
+
+      if (note_val === scale[last_note_in_octave]){
+        if (octave - params.octave > (params.octave_range - 1)){
+          console.log("resetting octave");
+          octave = params.octave;
+        }
+        else{
+          octave += direction_val;
+        }
+      }
+
+      HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
+
+      note = new NoteEvent(HzNote, params.note_length);
       events.push(note);
     }
   }
 
   function getNextNote(i, params){
-    var goingUp = false;
+    var scale_length = params.scale.length;
 
-    if (params.direction === "up"){
-      goingUp = true;
-    }
-    if(goingUp){
-      return (i + 1) % params.scale.length;
+    if(params.direction === "up"){
+      return (i + 1) % scale_length;
     }
     else {
-      return (params.notes - i) % params.scale.length;
+      return (params.notes - i) % scale_length;
     }
   }
 
@@ -305,10 +322,12 @@ window.Bleep = (function() {
       var params;
     }
 
+    // replace default params with any user-defined
     for(var p in params){
       dp[p] = params[p];
     }
 
+    // convert root note from string to steps
     if(typeof dp.root_note === "string"){
       dp.root_note = stringToStepsFromA(dp.root_note)
     }

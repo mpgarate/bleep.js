@@ -121,6 +121,7 @@ function getScale(type,root){
     "pentatonic": [0,3,5,7,10],
     "blues": [0,3,5,6,7,10]
   }
+  console.log(type);
   var scale = types[type];
 
   for(var i = 0; i < scale.length; i++){

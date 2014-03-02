@@ -72,7 +72,7 @@ $( document ).ready(function() { /*
 
   $('.arp-fn').click(function(){
     var params = {
-      direction: "down",  // default: "up"
+      direction: "down"  // default: "up"
     }
 
     Bleep.arp(params); 
