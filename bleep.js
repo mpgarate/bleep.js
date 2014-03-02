@@ -62,32 +62,32 @@ window.Bleep = (function() {
   // note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   // octave is in MIDI standard, 0-8
-  Bleep.tone = function(note, duration, octave){
+  Bleep.tone = function(noteString, duration, octave){
     if (typeof duration === 'undefined'){
       duration = Settings["default_note_length"];
     }
     // Handle rest
-    if (note.charAt(0) === 'R'){
-      Bleep.rest(note.charAt(1));
+    if (noteString.charAt(0) === 'R'){
+      Bleep.rest(noteString.charAt(1));
       return;
     }
-    var HzNote = stringToHzNote(note, octave);
+    var HzNote = stringToHzNote(noteString, octave);
     
     var note = new NoteEvent(HzNote,duration);
     events.push(note);
 
-    console.log("Pushed note to queue: ");
+    console.log("Pushed note to queue: " + noteString);
     console.log(note);
   }
 
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
-  Bleep.rest = function(arg){
-    duration = Bleep.__restArgToDuration(arg);
+  Bleep.rest = function(restString){
+    duration = Bleep.__restArgToDuration(restString);
     var rest = new RestEvent(duration);
     events.push(rest);
 
-    console.log("Pushed rest to queue: ");
+    console.log("Pushed rest to queue: " + restString);
     console.log(rest);
   }
 

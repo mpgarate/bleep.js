@@ -76,8 +76,8 @@ $( document ).ready(function() { /*
 
   $('.tone-fn').click(function(){
     Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
-    Bleep.tone("A#2",16); //Bleep.tone(note, duration);
-    Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
+    Bleep.tone("A#5",16); //Bleep.tone(note, duration);
+    Bleep.tone("F", 2, 4); //Bleep.tone(note, duration, octave);
     Bleep.start();
   });
 
