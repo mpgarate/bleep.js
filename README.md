@@ -26,7 +26,7 @@ var params = {
   octave_range: 2     // default: 1
 }
 
-Bleep.bloop(8);
+Bleep.bloop(params);
 ~~~
 
 Composing Tunes
