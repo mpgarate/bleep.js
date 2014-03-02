@@ -46,26 +46,24 @@ $( document ).ready(function() { /*
     Bleep.tone("A4");
 */
 
-  $('.bloop').click(function(){
+  $('.bloop-fn').click(function(){
     Bleep.bloop();
     Bleep.start();
   });
-  $('.bloop-8').click(function(){
-    Bleep.bloop(8);
-    Bleep.start();
+
+  $('.bloop-params-fn').click(function(){
+    var params = {
+    key: "C",           // default: "A"
+    scale: "major",     // default: "minor"
+    notes: 32,          // default: 8
+    duration: 8,        // default: 16
+    tempo: 90,          // default: 120
+    octave: 4,          // default: 4
+    octave_range: 2     // default: 1
+  }
+
+  Bleep.bloop(params);
   });
-  $('.arp').click(function(){
-    //Bleep.arp("C", "Minor", 32, 120); 
-    //Bleep.start();
-  });
-  $('.tone-rest').click(function(){
-    Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th noteBleep.rest(8); // will rest for length of 8th note
-    Bleep.rest(1); // will rest for length of whole note
-    Bleep.rest("R16"); // alternate syntax for 8th note
-    Bleep.tone("A#2",16); //Bleep.tone(note, duration);
-    Bleep.rest("R32"); // alternate syntax for whole note
-    Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
-    Bleep.start();
-  });
+
 
 });

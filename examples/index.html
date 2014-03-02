@@ -8,6 +8,8 @@
 
     <!-- Bootstrap -->
     <link href="bs/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bs/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="examples.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -17,35 +19,74 @@
     <![endif]-->
   </head>
   <body>
-    <h1>Bleep.js Examples</h1>
+    <div class="container">
+      <!-- Static navbar -->
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Bleep.js</a>
+          </div>
+          <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+              <li class="dropdown">
+              <li class="active"><a href="#">Examples</a></li>
+              <li><a href="https://github.com/mpgarate/bleep.js/">Github</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div><!--/.container-fluid -->
+      </div>
 
+      <!-- Main component for a primary marketing message or call to action -->
+      <h1>Bleep.js Examples</h1>
+      <div class="row">
+        <div class="col-sm-7">
 
-    <input class="note-input">
-    <a href="#" class="bloop">Bloop</a>
-    <a href="#" class="bloop-8">Bloop 8</a>
-    <a href="#" class="arp">Arp</a>
-    <a href="#" class="tone-rest">Tone and Rest</a>
-    <a href="#" class="sequence">Sequence</a>
-    <a href="#" class="bloopScoopDaWoop">bloopScoopDaWoop()</a>
+        <!-- Code Block -->
+          <pre>Bleep.bloop();</pre>
+          <p><a href="#" class="btn btn-large btn-success bloop-fn">Run code</a></p>
+          <br />
+          <p>lorem ipsum dolor sit amet</p>
 
-    <br />
+          <hr />
 
-    <a href="#" class="note-link">A</a>
-    <a href="#" class="note-link">B</a>
-    <a href="#" class="note-link">C</a>
-    <a href="#" class="note-link">D</a>
-    <a href="#" class="note-link">E</a>
-    <a href="#" class="note-link">F</a>
-    <a href="#" class="note-link">G</a>
+        <!-- Code Block -->
+          <h4><strong>bloop() with params</strong></h4>
+<pre>
+var params = {
+  key: "C",           // default: "A"
+  scale: "major",     // default: "minor"
+  notes: 32,          // default: 8
+  duration: 8,        // default: 16
+  tempo: 90,          // default: 120
+  octave: 4,          // default: 4
+  octave_range: 2     // default: 1
+}
 
-    <br />
+Bleep.bloop(params);
+</pre>
 
-    <a href="#" class="note-link">A#</a>
-    <a href="#" class="note-link">C#</a>
-    <a href="#" class="note-link">D#</a>
-    <a href="#" class="note-link">F#</a>
-    <a href="#" class="note-link">G#</a>
-    <br />
+          <p><a href="#" class="btn btn-large btn-success bloop-params-fn">Run code</a></p>
+        </div>
+
+        <!-- sidebar -->
+        <div class="col-sm-4">
+          <div class="sidebar">
+            <ul class="list-group">
+              <li class="list-group-item">Event queue is empty. </li>
+            </ul>
+        </div>
+      </div><!-- /row -->
+
+    </div> <!-- /container -->
+
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="jquery-2.1.0.min.js"></script>
