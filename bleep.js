@@ -67,7 +67,7 @@ window.Bleep = (function() {
     }
     // Handle rest
     if (noteString.charAt(0) === 'R'){
-      Bleep.rest(noteString.charAt(1));
+      Bleep.rest(noteString);
       return;
     }
     var HzNote = stringToHzNote(noteString, octave);
@@ -188,7 +188,7 @@ window.Bleep = (function() {
       }
     }
     else {
-      throw "Invalid rest parameter"
+      throw "Invalid rest parameter: " + arg
     }
   }
 
@@ -333,6 +333,18 @@ window.Bleep = (function() {
     }
 
     return dp;
+  }
+
+  Bleep.sequence = function(seq){
+    for(var n in seq){
+      var note = seq[n];
+      if (note.constructor.name === 'Array'){
+        Bleep.tone(note[0],note[1],note[2]);
+      }
+      else{
+        Bleep.tone(note);
+      }
+    }
   }
 
 
