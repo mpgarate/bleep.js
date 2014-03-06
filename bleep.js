@@ -15,6 +15,8 @@ window.Bleep = (function() {
   function RestEvent(note_length){
     this.note_length = note_length;
     this.volume = 0;
+    this.o;
+    this.g;
   }
 
   // Event Object for notes in music playback
@@ -22,6 +24,8 @@ window.Bleep = (function() {
     this.HzNote = HzNote;
     this.note_length = note_length;
     this.volume = 1;
+    this.o;
+    this.g;
   }
 
   // Event Object for setting adjustment
@@ -90,6 +94,77 @@ window.Bleep = (function() {
     console.log(rest);
   }
 
+function handleEvent(e){
+  // play this event
+  e.g.gain.value = e.volume;
+
+  // schedule its end
+  setTimeout(function(){
+    e.g.gain.value = 0;
+  }, e.duration - 10);
+
+
+  console.log("handling event:");
+  console.log(e);
+
+  // if last event, nothing to do
+  if (events.length === 0){
+    return;
+  }
+
+  // events[0] is the next event in queue
+
+
+  var next_event = prepareNextEvent();
+
+  // call self with the next in queue
+  setTimeout(function(){
+    console.log("calling handleEvent on ");
+    console.log(next_event);
+    handleEvent(next_event);
+  }, e.duration);
+}
+
+function prepareNextEvent(){
+  // set up next event
+  var e = events.shift();
+
+  if (e.constructor.name === "SettingEvent"){
+    // update value
+    Settings[e.settingName] = e.settingVal;
+    console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
+    // recurse
+    return prepareNextEvent();
+  }
+
+  e.g = context.createGain();
+  e.g.connect(context.destination);
+  e.g.gain.value = 0;
+
+  e.o = context.createOscillator();
+  e.o.type = Settings.waveform;
+  e.o.frequency.value = parseFloat(e.HzNote); 
+  e.o.connect(e.g);
+  e.o.start(0);
+
+  e.duration = Bleep.__noteLengthToMs(e.note_length);
+  e.volume = Bleep.__setVolumeForWaveformType(e.o,e);
+
+
+  return e;
+}
+
+Bleep.start = function(){
+  // Stop any pending sounds from last call to start()
+  // Bleep.stop();
+
+  var playTime = 0;
+  var e = prepareNextEvent();
+  handleEvent(e);
+}
+
+
+/*
   // Begin processing event queue. Schedule notes and rests. 
   Bleep.start = function(){
     // Stop any pending sounds from last call to start()
@@ -147,7 +222,7 @@ window.Bleep = (function() {
     // store setTimeout functions to allow clearing
     timeoutFunctions.push(t1);
   }
-
+*/
   // Convert a duration to ms using current BPM
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.__noteLengthToMs = function(d){
