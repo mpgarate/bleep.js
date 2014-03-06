@@ -1,7 +1,12 @@
 window.Bleep = (function() {
 
   function Bleep(){};
+  function EventQueue(){};
+  EventQueue.prototype = new Array();
+
   Bleep.version = "0.0.1";
+  Bleep.liveEvents;     // This queue is in active playback
+  Bleep.pendingEvents = new EventQueue();  // This queue can be built during playback
 
   // AudioContext instance used for sound generation
   context = new window.AudioContext;
@@ -51,14 +56,7 @@ window.Bleep = (function() {
 
 
   // Queue for handling events
-  var events = Bleep.events = [];
-  var timeoutFunctions = [];
-
-  var clearTimeoutFunctions = function(){
-    for (var i = 0; i < timeoutFunctions.length; i++){
-      clearTimeout(timeoutFunctions[i]);
-    }
-  }
+  var ACTIVE_NOTES = false;
 
 
   // Play a tone
@@ -77,7 +75,7 @@ window.Bleep = (function() {
     var HzNote = stringToHzNote(noteString, octave);
     
     var note = new NoteEvent(HzNote,note_length);
-    events.push(note);
+    Bleep.pendingEvents.push(note);
 
     console.log("Pushed note to queue: " + noteString);
     console.log(note);
@@ -86,151 +84,131 @@ window.Bleep = (function() {
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.rest = function(restString){
-    rest_note_length = Bleep.__restArgToDuration(restString);
+    rest_note_length = restArgToDuration(restString);
     var rest = new RestEvent(rest_note_length);
-    events.push(rest);
+    Bleep.pendingEvents.push(rest);
 
     console.log("Pushed rest to queue: " + restString);
     console.log(rest);
   }
 
-function handleEvent(e){
-  // play this event
-  e.g.gain.value = e.volume;
-
-  // schedule its end
-  setTimeout(function(){
-    e.g.gain.value = 0;
-  }, e.duration - 10);
-
-
-  console.log("handling event:");
-  console.log(e);
-
-  // if last event, nothing to do
-  if (events.length === 0){
-    return;
-  }
-
-  // events[0] is the next event in queue
-
-
-  var next_event = prepareNextEvent();
-
-  // call self with the next in queue
-  setTimeout(function(){
-    console.log("calling handleEvent on ");
-    console.log(next_event);
-    handleEvent(next_event);
-  }, e.duration);
-}
-
-function prepareNextEvent(){
-  // set up next event
-  var e = events.shift();
-
-  if (e.constructor.name === "SettingEvent"){
-    // update value
-    Settings[e.settingName] = e.settingVal;
-    console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
-    // recurse
-    return prepareNextEvent();
-  }
-
-  e.g = context.createGain();
-  e.g.connect(context.destination);
-  e.g.gain.value = 0;
-
-  e.o = context.createOscillator();
-  e.o.type = Settings.waveform;
-  e.o.frequency.value = parseFloat(e.HzNote); 
-  e.o.connect(e.g);
-  e.o.start(0);
-
-  e.duration = Bleep.__noteLengthToMs(e.note_length);
-  e.volume = Bleep.__setVolumeForWaveformType(e.o,e);
-
-
-  return e;
-}
-
-Bleep.start = function(){
-  // Stop any pending sounds from last call to start()
-  // Bleep.stop();
-
-  var playTime = 0;
-  var e = prepareNextEvent();
-  handleEvent(e);
-}
-
-
-/*
-  // Begin processing event queue. Schedule notes and rests. 
-  Bleep.start = function(){
-    // Stop any pending sounds from last call to start()
-    Bleep.stop();
-
-    var playTime = 0;
-    var e;
-
-    while(events.length > 0){
-      e = events.shift();
-      console.log("event:");
-      console.log(e);
-      if (e.constructor.name === "SettingEvent"){
-        Settings[e.settingName] = e.settingVal;
-        console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
-        continue;
-      }
-
-      var duration = Bleep.__noteLengthToMs(e.note_length);
-      var o = context.createOscillator();
-      var g = context.createGain();
-      o.type = Settings.waveform;
-      e.volume = Bleep.__setVolumeForWaveformType(o,e);
-      o.connect(g);
-      g.connect(context.destination);
-      g.gain.value = 0;
-      o.frequency.value = parseFloat(e.HzNote); 
-      o.start(0);
-
-      console.log(g);
-      Bleep.__playNote(e,playTime,o,g,duration);
-
-      playTime += duration;
+  function handleEvent(e){
+    if (e === null){
+      return;
+    }
+    else if (ACTIVE_NOTES === true){
+      setTimeout(function(){
+        handleEvent(e);
+      },10);
+    }
+    else{
+      handleEvent1(e);
     }
   }
 
-  Bleep.stop = function(){
-    clearTimeoutFunctions();
-  }
+  function handleEvent1(e){
+    // play this event
+    e.g.gain.value = e.volume;
 
-  // Play a note from the event queue
-  Bleep.__playNote = function(note, startTime, o, g, duration, master_volume){
-    var t1 = setTimeout(function(){
-      console.log(duration);
-      g.gain.value = note.volume;
-    }, startTime);
+    if (ACTIVE_NOTES === true){
+      throw 'sync error';
+    }
 
-    // end note early to prevent pop
+    ACTIVE_NOTES = true;
+
+    // schedule its end
     setTimeout(function(){
-      g.gain.value = 0;
-      g = null;
-      o = null;
-    }, startTime + duration - 10);
+      e.g.gain.value = 0;
+      ACTIVE_NOTES = false;
+    }, e.duration - 10);
 
-    // store setTimeout functions to allow clearing
-    timeoutFunctions.push(t1);
+
+    console.log("handling event:");
+    console.log(e);
+
+    // if last event, nothing to do
+    if (Bleep.liveEvents.length === 0){
+      return;
+    }
+
+    // events[0] is the next event in queue
+
+
+    var next_event = prepareNextEvent();
+
+    // call self with the next in queue
+    setTimeout(function(){
+      console.log("calling handleEvent on ");
+      console.log(next_event);
+      handleEvent(next_event);
+    }, e.duration);
   }
-*/
+
+  function prepareNextEvent(){
+    if(Bleep.liveEvents.length === 0){
+      return null;
+    }
+    // set up next event
+    var e = Bleep.liveEvents.shift();
+
+    if (e.constructor.name === "SettingEvent"){
+      // update value
+      Settings[e.settingName] = e.settingVal;
+      console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
+      // recurse
+      return prepareNextEvent();
+    }
+
+    e.g = context.createGain();
+    e.g.connect(context.destination);
+    e.g.gain.value = 0;
+
+    e.o = context.createOscillator();
+    e.o.type = Settings.waveform;
+    e.o.frequency.value = parseFloat(e.HzNote); 
+    e.o.connect(e.g);
+    e.o.start(0);
+
+    e.duration = noteLengthToMs(e.note_length);
+    e.volume = setVolumeForWaveformType(e.o,e);
+
+    return e;
+  }
+
+  Bleep.stop = function(){
+    Bleep.liveEvents = new EventQueue();
+  }
+
+  Bleep.start = function(){
+    // Stop any pending sounds from last call to start()
+    if (ACTIVE_NOTES === true){
+      Bleep.stop();
+      setTimeout(function(){
+        Bleep.start();
+      },20);
+    }
+    else{
+      Bleep.liveEvents = Bleep.pendingEvents;
+      Bleep.pendingEvents = new EventQueue();
+
+      var e = prepareNextEvent();
+      if (e === null){
+        return false;
+      }
+      else{
+        handleEvent(e);
+      }
+    }
+  }
+
   // Convert a duration to ms using current BPM
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
-  Bleep.__noteLengthToMs = function(d){
+  noteLengthToMs = function(d){
     return ((60000) / (Settings.bpm * (d/4)));
   }
 
   // Adjust the volume for wave type variations
-  Bleep.__setVolumeForWaveformType = function(o,e){
+  setVolumeForWaveformType = function(o,e){
     switch(o.type){
       case "sine" : 
         return e.volume * 1;
@@ -247,7 +225,7 @@ Bleep.start = function(){
     }
   }
 
-  Bleep.__restArgToDuration = function(arg){
+  restArgToDuration = function(arg){
     if (typeof arg === 'undefined'){
       return Settings.default_note_length;
     }
@@ -271,14 +249,14 @@ Bleep.start = function(){
     
     var e = new SettingEvent("bpm",val);
 
-    events.push(e);
+    Bleep.pendingEvents.push(e);
     console.log("Pushed bpm event to queue:");
     console.log(e);
   }
 
   Bleep.setWaveform = function(s){
     var e = new SettingEvent("waveform",s);
-    events.push(e);
+    Bleep.pendingEvents.push(e);
     console.log("Pushed waveform event to queue:");
     console.log(e);
   }
@@ -304,7 +282,7 @@ Bleep.start = function(){
       
       note = new NoteEvent(HzNote, params.note_length);
 
-      events.push(note);
+      Bleep.pendingEvents.push(note);
     }
   }
 
