@@ -64,15 +64,13 @@ Bleep.start();
         <!-- Code Block -->
 <pre>
 var params = {
-  root_note: "C",           // default: randomize
-
-  // possible scales: "minor", "major", "pentatonic", "blues"
-  scale_type: "blues",     // default: "minor"
-  notes: 32,          // default: 6
-  note_length: 8,        // default: 16
+  rootNote: "C",
+  scaleType: "blues",     // options: "minor" (default), "major", "pentatonic", "blues"
+  notes: 32,          // default: 8
+  noteLength: 8,        // default: 32
   bpm: 90,          // default: 120
   octave: 3,          // default: 4
-  octave_range: 2     // default: 1
+  octaveRange: 2     // default: 1
 }
 
 Bleep.bloop(params);

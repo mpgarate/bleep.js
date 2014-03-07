@@ -57,13 +57,13 @@ $( document ).ready(function() { /*
 
   $('.bloop-params-fn').click(function(){
     var params = {
-      root_note: "C",
-      scale_type: "blues",     // options: "minor" (default), "major", "pentatonic", "blues"
+      rootNote: "C",
+      scaleType: "blues",     // options: "minor" (default), "major", "pentatonic", "blues"
       notes: 32,          // default: 8
-      note_length: 8,        // default: 16
+      noteLength: 8,        // default: 32
       bpm: 90,          // default: 120
       octave: 3,          // default: 4
-      octave_range: 2     // default: 1
+      octaveRange: 2     // default: 1
     }
 
     Bleep.bloop(params);

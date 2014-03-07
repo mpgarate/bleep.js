@@ -13,21 +13,21 @@ window.Bleep = (function() {
 
   // Event parent object
   function Event(){
-    this.note_length;
+    this.noteLength;
   }
   
   // Event Object for rests, pauses in music playback
-  function RestEvent(note_length){
-    this.note_length = note_length;
+  function RestEvent(noteLength){
+    this.noteLength = noteLength;
     this.volume = 0;
     this.o;
     this.g;
   }
 
   // Event Object for notes in music playback
-  function NoteEvent(HzNote,note_length){
+  function NoteEvent(HzNote,noteLength){
     this.HzNote = HzNote;
-    this.note_length = note_length;
+    this.noteLength = noteLength;
     this.volume = 1;
     this.o;
     this.g;
@@ -49,9 +49,8 @@ window.Bleep = (function() {
 
   var Settings = Bleep.settings = {
     bpm: 90,
-    default_note_length: 16,
-    waveform: "sine",
-    master_volume: 1
+    defaultNoteLength: 16,
+    waveform: "sine"
   };
 
 
@@ -61,11 +60,11 @@ window.Bleep = (function() {
 
   // Play a tone
   // note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
-  // note_length: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
+  // noteLength: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   // octave is in MIDI standard, 0-8
-  Bleep.tone = function(noteString, note_length, octave){
-    if (typeof note_length === 'undefined'){
-      note_length = Settings.default_note_length;
+  Bleep.tone = function(noteString, noteLength, octave){
+    if (typeof noteLength === 'undefined'){
+      noteLength = Settings.defaultNoteLength;
     }
     // Handle rest
     if (noteString.charAt(0) === 'R'){
@@ -74,7 +73,7 @@ window.Bleep = (function() {
     }
     var HzNote = stringToHzNote(noteString, octave);
     
-    var note = new NoteEvent(HzNote,note_length);
+    var note = new NoteEvent(HzNote,noteLength);
     Bleep.pendingEvents.push(note);
 
     console.log("Pushed note to queue: " + noteString);
@@ -84,8 +83,8 @@ window.Bleep = (function() {
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.rest = function(restString){
-    rest_note_length = restArgToDuration(restString);
-    var rest = new RestEvent(rest_note_length);
+    restNoteLength = restArgToDuration(restString);
+    var rest = new RestEvent(restNoteLength);
     Bleep.pendingEvents.push(rest);
 
     console.log("Pushed rest to queue: " + restString);
@@ -134,13 +133,13 @@ window.Bleep = (function() {
     // events[0] is the next event in queue
 
 
-    var next_event = prepareNextEvent();
+    var nextEvent = prepareNextEvent();
 
     // call self with the next in queue
     setTimeout(function(){
       console.log("calling handleEvent on ");
-      console.log(next_event);
-      handleEvent(next_event);
+      console.log(nextEvent);
+      handleEvent(nextEvent);
     }, e.duration);
   }
 
@@ -169,7 +168,7 @@ window.Bleep = (function() {
     e.o.connect(e.g);
     e.o.start(0);
 
-    e.duration = noteLengthToMs(e.note_length);
+    e.duration = noteLengthToMs(e.noteLength);
     e.volume = setVolumeForWaveformType(e.o,e);
 
     return e;
@@ -227,7 +226,7 @@ window.Bleep = (function() {
 
   restArgToDuration = function(arg){
     if (typeof arg === 'undefined'){
-      return Settings.default_note_length;
+      return Settings.defaultNoteLength;
     }
     else if (typeof arg === "number"){
       return Number(arg);
@@ -262,25 +261,25 @@ window.Bleep = (function() {
   }
 
   Bleep.bloop = function(params){
-    var scale, note_val, note, octave, HzNote;
+    var scale, noteVal, note, octave, HzNote;
     params = setBloopParams(params);
 
     Bleep.setbpm(params.bpm);
 
-    scale = getScale(params.scale_type,params.root_note);
+    scale = getScale(params.scaleType,params.rootNote);
 
     for (var i = 0; i < params.notes; i++){
       if (i < params.notes - 1){
-        note_val = scale[getRandomArbitrary(0,scale.length)];
-        octave = params.octave + getRandomArbitrary(0,params.octave_range);
-        HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
+        noteVal = scale[getRandomArbitrary(0,scale.length)];
+        octave = params.octave + getRandomArbitrary(0,params.octaveRange);
+        HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
       }
       // Always end on the root note of the scale
       else{
-        HzNote = StepsToHzNote(halfStepsFromA(params.root_note,4));
+        HzNote = StepsToHzNote(halfStepsFromA(params.rootNote,4));
       }
       
-      note = new NoteEvent(HzNote, params.note_length);
+      note = new NoteEvent(HzNote, params.noteLength);
 
       Bleep.pendingEvents.push(note);
     }
@@ -289,12 +288,12 @@ window.Bleep = (function() {
   function setBloopParams(params){
     // default params
     var dp = {
-      root_note: getRandomArbitrary(0,12),
+      rootNote: getRandomArbitrary(0,12),
       notes: 6,
-      scale_type: "minor",
-      note_length: 32,
+      scaleType: "minor",
+      noteLength: 32,
       bpm: Settings.bpm,
-      octave_range: 1,
+      octaveRange: 1,
       octave: 4
     }
 
@@ -302,67 +301,66 @@ window.Bleep = (function() {
   }
 
   Bleep.arp = function(params){
-    var note_val, note, octave, HzNote, direction_val, scale;
-    var change_octave_at;
+    var noteVal, note, octave, HzNote, directionVal, scale;
 
     params = setArpParams(params);
 
     Bleep.setbpm(params.bpm);
 
-    params.scale = getScale(params.scale_type,params.root_note);
+    params.scale = getScale(params.scaleType,params.rootNote);
 
     octave = params.octave;
     scale = params.scale;
 
     if(params.direction === "up"){
-      direction_val = 1;
-      last_note_in_octave = 0;
+      directionVal = 1;
+      lastNoteInOctave = 0;
     }
     else{
-      direction_val = -1;
-      last_note_in_octave = scale.length -1;
+      directionVal = -1;
+      lastNoteInOctave = scale.length -1;
     }
 
     for (var i = 0; i < params.notes; i++){
-      note_val = scale[getNextNote(i, params)];
+      noteVal = scale[getNextNote(i, params)];
 
-      if (note_val === scale[last_note_in_octave]){
-        if (octave - params.octave > (params.octave_range - 1)){
+      if (noteVal === scale[lastNoteInOctave]){
+        if (octave - params.octave > (params.octaveRange - 1)){
           console.log("resetting octave");
           octave = params.octave;
         }
         else{
-          octave += direction_val;
+          octave += directionVal;
         }
       }
 
-      HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
+      HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
 
-      note = new NoteEvent(HzNote, params.note_length);
+      note = new NoteEvent(HzNote, params.noteLength);
       Bleep.pendingEvents.push(note);
     }
   }
 
   function getNextNote(i, params){
-    var scale_length = params.scale.length;
+    var scaleLength = params.scale.length;
 
     if(params.direction === "up"){
-      return (i + 1) % scale_length;
+      return (i + 1) % scaleLength;
     }
     else {
-      return (params.notes - i) % scale_length;
+      return (params.notes - i) % scaleLength;
     }
   }
 
   function setArpParams(params){
     // default params
     var dp = {
-      root_note: "A",
+      rootNote: "A",
       notes: 20,
-      scale_type: "minor",
-      note_length: 32,
+      scaleType: "minor",
+      noteLength: 32,
       bpm: Settings.bpm,
-      octave_range: 1,
+      octaveRange: 1,
       octave: 4,
       direction: "up"
     }
@@ -381,8 +379,8 @@ window.Bleep = (function() {
     }
 
     // convert root note from string to steps
-    if(typeof dp.root_note === "string"){
-      dp.root_note = stringToStepsFromA(dp.root_note)
+    if(typeof dp.rootNote === "string"){
+      dp.rootNote = stringToStepsFromA(dp.rootNote)
     }
 
     return dp;
