@@ -9,6 +9,9 @@
     <!-- Bootstrap -->
     <link href="bs/css/bootstrap.min.css" rel="stylesheet">
     <link href="bs/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="jquery-ui.css" />
+
     <link href="examples.css" rel="stylesheet">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -56,7 +59,18 @@ Bleep.start();
 </pre>
           <p><a href="#" class="btn btn-large btn-success bloop-fn">Run code</a></p>
           <br />
-          <p>lorem ipsum dolor sit amet</p>
+          <hr />
+        <!-- End Code Block -->
+
+
+        <!-- Code Block -->
+<pre>
+Bleep.setWaveform("sawtooth"); // indicate sine, sqaure, sawtooth, or triangle
+Bleep.bloop();
+Bleep.start();
+</pre>
+          <p><a href="#" class="btn btn-large btn-success bloop-saw">Run code</a></p>
+          <br />
           <hr />
         <!-- End Code Block -->
 
@@ -146,8 +160,17 @@ Bleep.start();
         <div class="col-sm-4">
           <div class="sidebar pull-right">
           <p>
-          <a href="javascript:;" class="btn btn-danger stop">Silence</a>
+            <a href="javascript:;" class="btn btn-danger stop">Silence</a>
           </p>
+          <p>
+
+          <label>Volume</label>
+            <span class="tooltip"></span>
+            <div id="slider"></div>
+            <span class="volume"></span>
+          </p>
+          <label>Event Queue</label>
+          <br />
             <ul class="list-group pull-right">
               <li class="list-group-item">Event queue is empty. </li>
             </ul>
@@ -165,6 +188,7 @@ Bleep.start();
     <script src="../inc/AudioContextMonkeyPatch.js"></script>
     <script src="../audio-helpers.js"></script>
     <script src="../bleep.js"></script>
+    <script src="jquery-ui.min.js"></script>
     <script src="examples.js"></script>
   </body>
 </html>

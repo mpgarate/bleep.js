@@ -8,9 +8,6 @@ window.Bleep = (function() {
   Bleep.liveEvents;     // This queue is in active playback
   Bleep.pendingEvents = new EventQueue();  // This queue can be built during playback
 
-  // AudioContext instance used for sound generation
-  context = new window.AudioContext;
-
   // Event parent object
   function Event(){
     this.noteLength;
@@ -50,9 +47,16 @@ window.Bleep = (function() {
   var Settings = Bleep.settings = {
     bpm: 90,
     defaultNoteLength: 16,
-    waveform: "sine"
+    waveform: "sine",
+    masterVolume: 1
   };
 
+
+  // AudioContext instance used for sound generation
+  AC = new window.AudioContext;
+  MASTER_GAIN = AC.createGain();
+  MASTER_GAIN.connect(AC.destination);
+  MASTER_GAIN.gain.value = Settings.masterVolume;
 
   // Queue for handling events
   var ACTIVE_NOTES = false;
@@ -158,11 +162,11 @@ window.Bleep = (function() {
       return prepareNextEvent();
     }
 
-    e.g = context.createGain();
-    e.g.connect(context.destination);
+    e.g = AC.createGain();
+    e.g.connect(MASTER_GAIN);
     e.g.gain.value = 0;
 
-    e.o = context.createOscillator();
+    e.o = AC.createOscillator();
     e.o.type = Settings.waveform;
     e.o.frequency.value = parseFloat(e.HzNote); 
     e.o.connect(e.g);
@@ -258,6 +262,19 @@ window.Bleep = (function() {
     Bleep.pendingEvents.push(e);
     console.log("Pushed waveform event to queue:");
     console.log(e);
+  }
+
+  Bleep.setMasterVolume = function(s){
+    var e = new SettingEvent("masterVolume",parseFloat(s));
+    Bleep.pendingEvents.push(e);
+    console.log("Pushed masterVolume event to queue:");
+    console.log(e);
+  }
+
+  Bleep.liveSetMasterVolume = function(v){
+    v = parseFloat(v);
+    Settings.masterVolume = v;
+    MASTER_GAIN.gain.value = v;
   }
 
   Bleep.bloop = function(params){

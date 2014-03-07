@@ -46,7 +46,27 @@ $( document ).ready(function() { /*
     Bleep.tone("A4");
 */
 
+  var slider = $('#slider');
+  slider.slider({
+    range:"min",
+    value: 60,
+    slide: function(event, ui) {   
+      var value = slider.slider('value');
+      value = parseFloat(value/100);
+      Bleep.liveSetMasterVolume(value);
+    }
+  });
+
+
+    $( "#slider" ).slider();  
+
   $('.bloop-fn').click(function(){
+    Bleep.bloop();
+    Bleep.start();
+  });
+
+  $('.bloop-saw').click(function(){
+    Bleep.setWaveform("sawtooth"); // indicate sine, sqaure, sawtooth, or triangle
     Bleep.bloop();
     Bleep.start();
   });
@@ -111,7 +131,5 @@ $( document ).ready(function() { /*
     Bleep.start();
   });
 
-  var draw_events = function(){
-  }
 
 });
