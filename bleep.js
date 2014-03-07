@@ -277,8 +277,65 @@ window.Bleep = (function() {
     MASTER_GAIN.gain.value = v;
   }
 
+  // interval measured in half steps
+  function getRandomInterval(){
+    var chance = getRandomArbitrary(0,9);
+    var interval;
+    if(chance === 0){
+      interval = 0;
+    }
+    // add two scale degrees (usually from root third)
+    else if (chance < 3){
+      interval = 2;
+    }
+    // add one scale degree
+    else if (chance < 7){
+      interval = 1;
+    }
+    else if (chance < 9){
+      interval = 3;
+    }
+    else{
+      interval = 4;
+    }
+
+    return interval;
+  }
+
+  function generateInterval(prevoiusInterval){
+    if (prevoiusInterval === 0){
+      prevoiusInterval = getRandomInterval();
+    }
+    var interval;
+    var switchChance = getRandomArbitrary(0,9);
+    var newIntervalChance = getRandomArbitrary(0,9);
+    var directionChance = getRandomArbitrary(0,9);
+
+    var direction = 1;
+    if (prevoiusInterval < 0){
+      var direction = -1; // 1 is up, -1 down
+    }
+
+    // 40% chance of switching to a different interval
+    if (newIntervalChance > 5){
+      interval = getRandomInterval();
+    }
+    else{
+      interval = Math.abs(prevoiusInterval);
+    }
+
+    // 40% change of changing direction
+    if (directionChance > 5){
+      direction = (direction * -1);
+    }
+
+    console.log("made interval: " + interval + " direction: " + direction )
+    return interval * direction;
+
+  }
+
   Bleep.bloop = function(params){
-    var scale, noteVal, note, octave, HzNote;
+    var scale, noteVal, note, octave, HzNote, previousNote, prevoiusInterval;
     params = setBloopParams(params);
 
     Bleep.setbpm(params.bpm);
@@ -286,19 +343,35 @@ window.Bleep = (function() {
     scale = getScale(params.scaleType,params.rootNote);
 
     for (var i = 0; i < params.notes; i++){
-      if (i < params.notes - 1){
+      if (i === 0){
         noteVal = scale[getRandomArbitrary(0,scale.length)];
+        octave = params.octave + getRandomArbitrary(0,params.octaveRange);
+        HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
+
+        interval = 0;
+      }
+      else if (i < params.notes - 1){
+        var interval = generateInterval(prevoiusInterval);
+        console.log("interval: " + interval + " previousNote: " + previousNote +  " newNote: " + (previousNote + interval));
+        var scaleDegree = (previousNote + interval) % (scale.length - 1);
+        console.log("scale degree is " + scaleDegree + " of " + scale.length);
+        noteVal = scale[scaleDegree];
         octave = params.octave + getRandomArbitrary(0,params.octaveRange);
         HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
       }
       // Always end on the root note of the scale
       else{
-        HzNote = StepsToHzNote(halfStepsFromA(params.rootNote,4));
+        noteVal = halfStepsFromA(params.rootNote,4);
+        HzNote = StepsToHzNote(noteVal);
       }
       
       note = new NoteEvent(HzNote, params.noteLength);
-
       Bleep.pendingEvents.push(note);
+
+
+      prevoiusInterval = interval;
+      previousNote = noteVal;
+      console.log("made prevNote: " + previousNote);
     }
   }
 
