@@ -339,7 +339,7 @@ window.Bleep = (function() {
       HzNote = StepsToHzNote(halfStepsFromA(note_val,octave));
 
       note = new NoteEvent(HzNote, params.note_length);
-      events.push(note);
+      Bleep.pendingEvents.push(note);
     }
   }
 

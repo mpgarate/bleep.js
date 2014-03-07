@@ -100,12 +100,18 @@ $( document ).ready(function() { /*
     Bleep.start();
   });
 
+  $('.mary-lamb').click(function(){
+    var lambSeq = [
+      "E", "D", "C", "D",
+      "E", "E", "E", "R16",
+      "D", "D", "D", "R16",
+      "E", "G", "G"
+      ]
+    Bleep.sequence(lambSeq);
+    Bleep.start();
+  });
+
   var draw_events = function(){
-    var events = Bleep.events;
-    var sidebar = $('.sidebar');
-    for (var i = 0; i < events.length; i++){
-      sidebar.append(events[i]);
-    }
   }
 
 });
