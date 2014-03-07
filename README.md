@@ -7,6 +7,8 @@ With Bleep, notes are appended to an asynchronous playback queue to allow compos
 
 Bleep depends on AudioContext or webkitAudioContext, currently only available in Chrome and (untested) Safari. Some FireFox support thanks to [cwilso's MonkeyPatch](https://github.com/cwilso/AudioContext-MonkeyPatch). 
 
+Demo: http://michaelgarate.com/bleep/examples/
+
 Basic usage
 -----------
 
