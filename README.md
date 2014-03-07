@@ -83,8 +83,9 @@ Configure Bleep
 --------
 Adjust these before calling arp, bloop, tone. 
 ~~~ js
-Bleep.setWaveform("sine"); // indicate sine, sqaure, sawtooth, triangle
-Bleep.setbpm(120); // tempo in beats per minute
+Bleep.setWaveform("sine");  // indicate sine, sqaure, sawtooth, triangle
+Bleep.setbpm(120);          // tempo in beats per minute
+Bleep.setMasterVolume(0.8); // scale from 0 to 1
 ~~~
 
 These setting helpers are handled as events in the queue so you can change them throughout your composition:
@@ -103,6 +104,11 @@ Bleep.tone("C4");
 Bleep.tone("A4");
 Bleep.tone("E4");
 Bleep.tone("A4");
+~~~
+
+The master volume can also be set instantly with `Bleep.liveSetMasterVolume()`
+~~~ js
+Bleep.liveSetMasterVolume(value);
 ~~~
 
 Advanced Usage
