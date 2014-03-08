@@ -512,6 +512,15 @@ window.Bleep = (function() {
     }
   }
 
+  Bleep.getEvents = function(){
+    if (Bleep.liveEvents.length === 0){
+      return Bleep.pendingEvents;
+    }
+    else{
+      return Bleep.liveEvents;
+    }
+  }
+
 
   return Bleep;
 }());

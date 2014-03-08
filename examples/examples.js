@@ -65,11 +65,7 @@ $( document ).ready(function() { /*
 
     list.html("");
 
-    var events = Bleep.liveEvents;
-
-    if (events.length === 0){
-      events = Bleep.pendingEvents;
-    }
+    var events = Bleep.getEvents();
 
     for (var i = 0; i < events.length; i++){
       list.append('<li class="list-group-item">' + (Number(events[i].HzNote)).toFixed(2) + ' Hz </li>');
@@ -85,6 +81,7 @@ $( document ).ready(function() { /*
     Bleep.setWaveform("sawtooth"); // indicate sine, sqaure, sawtooth, or triangle
     Bleep.bloop();
     Bleep.start();
+    Bleep.setWaveform("sine");     // reset the waveform for future use of Bleep 
   });
 
   $('.stop').click(function(){
