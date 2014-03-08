@@ -65,16 +65,19 @@ $( document ).ready(function() { /*
 
     list.html("");
 
-    var events = Bleep.pendingEvents;
+    var events = Bleep.liveEvents;
+
+    if (events.length === 0){
+      events = Bleep.pendingEvents;
+    }
 
     for (var i = 0; i < events.length; i++){
-      list.append('<li class="list-group-item">' + (Number(events[i].HzNote)).toFixed(2) + '</li>');
+      list.append('<li class="list-group-item">' + (Number(events[i].HzNote)).toFixed(2) + ' Hz </li>');
     }
   }
 
   $('.bloop-fn').click(function(){
     Bleep.bloop();
-    show_queue();
     Bleep.start();
   });
 
@@ -143,5 +146,12 @@ $( document ).ready(function() { /*
     Bleep.start();
   });
 
+
+  Bleep.onListChange(function(){
+    show_queue();
+  });
+  Bleep.onNoteEnd(function(){
+    show_queue();
+  });
 
 });

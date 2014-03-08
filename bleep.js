@@ -3,9 +3,14 @@ window.Bleep = (function() {
   function Bleep(){};
   function EventQueue(){};
   EventQueue.prototype = new Array();
+  EventQueue.prototype.doPush = function(o){
+    var val = this.push(o);
+    runCallbacks(OnListChangeFunctions);
+    return val;
+  }
 
   Bleep.version = "0.0.1";
-  Bleep.liveEvents;     // This queue is in active playback
+  Bleep.liveEvents = new EventQueue();     // This queue is in active playback
   Bleep.pendingEvents = new EventQueue();  // This queue can be built during playback
 
   // Event parent object
@@ -61,6 +66,10 @@ window.Bleep = (function() {
   // Queue for handling events
   var ACTIVE_NOTES = false;
 
+  // Store callback functions to be triggered after note play
+  var OnNoteFunctions = Bleep.onNoteFunctions = new Array();
+  var OnListChangeFunctions = Bleep.onNoteFunctions = new Array();
+
 
   // Play a tone
   // note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
@@ -78,7 +87,7 @@ window.Bleep = (function() {
     var HzNote = stringToHzNote(noteString, octave);
     
     var note = new NoteEvent(HzNote,noteLength);
-    Bleep.pendingEvents.push(note);
+    Bleep.pendingEvents.doPush(note);
 
     console.log("Pushed note to queue: " + noteString);
     console.log(note);
@@ -89,10 +98,23 @@ window.Bleep = (function() {
   Bleep.rest = function(restString){
     restNoteLength = restArgToDuration(restString);
     var rest = new RestEvent(restNoteLength);
-    Bleep.pendingEvents.push(rest);
+    Bleep.pendingEvents.doPush(rest);
 
     console.log("Pushed rest to queue: " + restString);
     console.log(rest);
+  }
+
+  Bleep.onNoteEnd = function(fn){
+    OnNoteFunctions.push(fn);
+  }
+  Bleep.onListChange = function(fn){
+    OnListChangeFunctions.push(fn);
+  }
+
+  function runCallbacks(fns){
+    for(var i = 0; i < fns.length; i++){
+      fns[i]();
+    }
   }
 
   function handleEvent(e){
@@ -122,9 +144,11 @@ window.Bleep = (function() {
     // schedule its end
     setTimeout(function(){
       e.g.gain.value = 0;
+      runCallbacks(OnNoteFunctions);
       ACTIVE_NOTES = false;
     }, e.duration - 10);
 
+    runCallbacks(OnNoteFunctions);
 
     console.log("handling event:");
     console.log(e);
@@ -252,21 +276,21 @@ window.Bleep = (function() {
     
     var e = new SettingEvent("bpm",val);
 
-    Bleep.pendingEvents.push(e);
+    Bleep.pendingEvents.doPush(e);
     console.log("Pushed bpm event to queue:");
     console.log(e);
   }
 
   Bleep.setWaveform = function(s){
     var e = new SettingEvent("waveform",s);
-    Bleep.pendingEvents.push(e);
+    Bleep.pendingEvents.doPush(e);
     console.log("Pushed waveform event to queue:");
     console.log(e);
   }
 
   Bleep.setMasterVolume = function(s){
     var e = new SettingEvent("masterVolume",parseFloat(s));
-    Bleep.pendingEvents.push(e);
+    Bleep.pendingEvents.doPush(e);
     console.log("Pushed masterVolume event to queue:");
     console.log(e);
   }
@@ -366,7 +390,7 @@ window.Bleep = (function() {
       }
       
       note = new NoteEvent(HzNote, params.noteLength);
-      Bleep.pendingEvents.push(note);
+      Bleep.pendingEvents.doPush(note);
 
 
       prevoiusInterval = interval;
@@ -427,7 +451,7 @@ window.Bleep = (function() {
       HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
 
       note = new NoteEvent(HzNote, params.noteLength);
-      Bleep.pendingEvents.push(note);
+      Bleep.pendingEvents.doPush(note);
     }
   }
 
