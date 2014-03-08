@@ -60,8 +60,21 @@ $( document ).ready(function() { /*
 
     $( "#slider" ).slider();  
 
+  function show_queue(){
+    var list = $('.list-group');
+
+    list.html("");
+
+    var events = Bleep.pendingEvents;
+
+    for (var i = 0; i < events.length; i++){
+      list.append('<li class="list-group-item">' + (Number(events[i].HzNote)).toFixed(2) + '</li>');
+    }
+  }
+
   $('.bloop-fn').click(function(){
     Bleep.bloop();
+    show_queue();
     Bleep.start();
   });
 
