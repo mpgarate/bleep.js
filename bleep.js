@@ -1,7 +1,7 @@
 var Bleep = (function() {
   'use strict';
 
-  function Bleep(){};
+  function Bleep(){}
 
   Bleep.version = '0.0.1';
 
@@ -14,7 +14,7 @@ var Bleep = (function() {
 
   /***** Event Queue *****/
 
-  function EventQueue(){};
+  function EventQueue(){}
 
   EventQueue.prototype = [];
 
@@ -33,7 +33,7 @@ var Bleep = (function() {
   /***** Event Classes *****/
 
   // Event parent object
-  function Event(){};
+  function Event(){}
   
   // Event Object for rests, pauses in music playback
   function RestEvent(noteLength){
@@ -132,6 +132,8 @@ var Bleep = (function() {
     console.log(note);
   };
 
+
+
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.rest = function(restString){
@@ -143,15 +145,21 @@ var Bleep = (function() {
     console.log(rest);
   };
 
+
+
   // Add a callback function for after a note ends
   Bleep.onNoteEnd = function(fn){
     OnNoteFunctions.push(fn);
   };
 
+
+
   // Add a callback function for event add
   Bleep.onListChange = function(fn){
     OnListChangeFunctions.push(fn);
   };
+
+
 
   Bleep.sequence = function(seq){
     for(var n in seq){
@@ -165,6 +173,8 @@ var Bleep = (function() {
     }
   };
 
+
+
   Bleep.getEvents = function(){
     if (Bleep.liveEvents.length === 0){
       return Bleep.pendingEvents;
@@ -173,6 +183,8 @@ var Bleep = (function() {
       return Bleep.liveEvents;
     }
   };
+
+
 
   // Create events for setting changes
   Bleep.setbpm = function(val){
@@ -184,12 +196,16 @@ var Bleep = (function() {
     console.log(e);
   };
 
+
+
   Bleep.setWaveform = function(s){
     var e = new SettingEvent('waveform',s);
     Bleep.pendingEvents.doPush(e);
     console.log('Pushed waveform event to queue:');
     console.log(e);
   };
+
+
 
   Bleep.setMasterVolume = function(s){
     var e = new SettingEvent('masterVolume',parseFloat(s));
@@ -198,6 +214,8 @@ var Bleep = (function() {
     console.log(e);
   };
 
+
+
   Bleep.liveSetMasterVolume = function(v){
     v = parseFloat(v);
     Settings.masterVolume = v;
@@ -205,9 +223,12 @@ var Bleep = (function() {
   };
 
 
+
   Bleep.stop = function(){
     Bleep.liveEvents = new EventQueue();
   };
+
+
 
   // Begin playback
   Bleep.start = function(){
@@ -232,6 +253,15 @@ var Bleep = (function() {
     }
   };
 
+
+
+
+
+  /********************************/
+  /***** Event Queue Playback *****/
+  /********************************/
+
+  // driver for handleEvent1 to check for null and playing notes
   function handleEvent(e){
     if (e === null){
       return;
@@ -246,6 +276,8 @@ var Bleep = (function() {
     }
   }
 
+  // Make the note audible for its duration property
+  // Prepare and call the next note when it is due
   function handleEvent1(e){
     // play this event
     e.g.gain.value = e.volume;
@@ -276,6 +308,7 @@ var Bleep = (function() {
     }, e.duration);
   }
 
+  // Get the next event in the queue and prepare it for playback
   function prepareNextEvent(){
     if(Bleep.liveEvents.length === 0){
       return null;
@@ -288,7 +321,6 @@ var Bleep = (function() {
     if (e.constructor.name === 'SettingEvent'){
       // update value
       Settings[e.settingName] = e.settingVal;
-      console.log('made setting ' + e.settingName + ' : ' + Settings[e.settingName]);
       // recurse
       if(Bleep.liveEvents.length === 0){
         runCallbacks(OnNoteFunctions);
@@ -314,46 +346,11 @@ var Bleep = (function() {
     return e;
   }
 
-  // Convert a duration to ms using current BPM
-  // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
-  function noteLengthToMs(d){
-    return ((60000) / (Settings.bpm * (d/4)));
-  }
 
-  // Adjust the volume for wave type variations
-  function setVolumeForWaveformType(o,e){
-    switch(o.type){
-      case 'sine' :
-        return e.volume * 1;
-      case 'square':
-        return e.volume * 0.3;
-      case 'sawtooth':
-        return e.volume * 0.4;
-      case 'triangle':
-        return e.volume * 0.8;
-    }
-  }
 
-  function restArgToDuration(arg){
-    if (typeof arg === 'undefined'){
-      return Settings.defaultNoteLength;
-    }
-    else if (typeof arg === 'number'){
-      return Number(arg);
-    }
-    else if (arg.charAt(0) === 'R'){
-      if (arg.length === 3 ){
-        return arg.substring(1,3);
-      }
-      else{
-        return Number(arg.charAt(1));
-      }
-    }
-    else {
-      throw 'Invalid rest parameter: ' + arg;
-    }
-  }
-
+  /*********************************/
+  /***** Bleep.bloop() Helpers *****/
+  /*********************************/
 
   // interval measured in half steps
   function getRandomInterval(){
@@ -406,13 +403,12 @@ var Bleep = (function() {
       direction = (direction * -1);
     }
 
-    console.log('made interval: ' + interval + ' direction: ' + direction );
     return interval * direction;
 
   }
 
   Bleep.bloop = function(params){
-    var scale, noteVal, note, octave, HzNote, previousNote, prevoiusInterval;
+    var scale, noteVal, note, octave, HzNote, previousNote, prevoiusInterval, interval;
     params = setBloopParams(params);
 
     Bleep.setbpm(params.bpm);
@@ -423,24 +419,21 @@ var Bleep = (function() {
       if (i === 0){
         noteVal = scale[getRandomArbitrary(0,scale.length)];
         octave = params.octave + getRandomArbitrary(0,params.octaveRange);
-        HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
+        HzNote = stepsToHzNote(halfStepsFromA(noteVal,octave));
 
         interval = 0;
       }
       else if (i < params.notes - 1){
-        var interval = generateInterval(prevoiusInterval);
-        console.log('interval: ' + interval + ' previousNote: ' + previousNote +  ' newNote: ' + (previousNote + interval));
+        interval = generateInterval(prevoiusInterval);
         var scaleDegree = (previousNote + interval) % (scale.length - 1);
-        console.log('scale degree is ' + scaleDegree + ' of ' + scale.length);
         noteVal = scale[scaleDegree];
         octave = params.octave + getRandomArbitrary(0,params.octaveRange);
-        HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
+        HzNote = stepsToHzNote(halfStepsFromA(noteVal,octave));
       }
       // Always end on the root note of the scale
       else{
-        console.log('root note');
         noteVal = halfStepsFromA(params.rootNote,4);
-        HzNote = StepsToHzNote(noteVal);
+        HzNote = stepsToHzNote(noteVal);
       }
       
       note = new NoteEvent(HzNote, params.noteLength);
@@ -449,24 +442,8 @@ var Bleep = (function() {
 
       prevoiusInterval = interval;
       previousNote = noteVal;
-      console.log('made prevNote: ' + previousNote);
     }
-  }
-
-  function setBloopParams(params){
-    // default params
-    var dp = {
-      rootNote: getRandomArbitrary(0,12),
-      notes: 6,
-      scaleType: 'minor',
-      noteLength: 32,
-      bpm: Settings.bpm,
-      octaveRange: 1,
-      octave: 4
-    }
-
-    return setFooParams(params,dp);
-  }
+  };
 
   Bleep.arp = function(params){
     var noteVal, note, octave, HzNote, directionVal, scale, lastNoteInOctave;
@@ -494,7 +471,6 @@ var Bleep = (function() {
 
       if (noteVal === scale[lastNoteInOctave]){
         if (octave - params.octave > (params.octaveRange - 1)){
-          console.log('resetting octave');
           octave = params.octave;
         }
         else{
@@ -502,12 +478,12 @@ var Bleep = (function() {
         }
       }
 
-      HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
+      HzNote = stepsToHzNote(halfStepsFromA(noteVal,octave));
 
       note = new NoteEvent(HzNote, params.noteLength);
       Bleep.pendingEvents.doPush(note);
     }
-  }
+  };
 
   function getNextNote(i, params){
     var scaleLength = params.scale.length;
@@ -518,6 +494,28 @@ var Bleep = (function() {
     else {
       return (params.notes - i) % scaleLength;
     }
+  }
+
+
+
+  /***************************************/
+  /***** Set default hash parameters. ****/
+  /******** Used by bloop and arp. *******/
+  /***************************************/
+
+  function setBloopParams(params){
+    // default params
+    var dp = {
+      rootNote: getRandomArbitrary(0,12),
+      notes: 6,
+      scaleType: 'minor',
+      noteLength: 32,
+      bpm: Settings.bpm,
+      octaveRange: 1,
+      octave: 4
+    };
+
+    return setFooParams(params,dp);
   }
 
   function setArpParams(params){
@@ -531,16 +529,12 @@ var Bleep = (function() {
       octaveRange: 1,
       octave: 4,
       direction: 'up'
-    }
+    };
 
     return setFooParams(params, dp);
   }
 
   function setFooParams(params,dp){
-    if (typeof params === 'undefined'){
-      var params;
-    }
-
     // replace default params with any user-defined
     for(var p in params){
       dp[p] = params[p];
@@ -548,150 +542,190 @@ var Bleep = (function() {
 
     // convert root note from string to steps
     if(typeof dp.rootNote === 'string'){
-      dp.rootNote = stringToStepsFromA(dp.rootNote)
+      dp.rootNote = stringToStepsFromA(dp.rootNote);
     }
 
     return dp;
   }
 
+  /********************************/
+  /***** Bleep Syntax Helpers *****/
+  /********************************/
 
+  // Convert a duration to ms using current BPM
+  // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
+  function noteLengthToMs(d){
+    return ((60000) / (Settings.bpm * (d/4)));
+  }
 
+  // Adjust the volume for wave type variations
+  function setVolumeForWaveformType(o,e){
+    switch(o.type){
+      case 'sine' :
+        return e.volume * 1;
+      case 'square':
+        return e.volume * 0.3;
+      case 'sawtooth':
+        return e.volume * 0.4;
+      case 'triangle':
+        return e.volume * 0.8;
+    }
+  }
+
+  function restArgToDuration(arg){
+    if (typeof arg === 'undefined'){
+      return Settings.defaultNoteLength;
+    }
+    else if (typeof arg === 'number'){
+      return Number(arg);
+    }
+    else if (arg.charAt(0) === 'R'){
+      if (arg.length === 3 ){
+        return arg.substring(1,3);
+      }
+      else{
+        return Number(arg.charAt(1));
+      }
+    }
+    else {
+      throw 'Invalid rest parameter: ' + arg;
+    }
+  }
 
   /********************************/
   /***** Audio Helper Methods *****/
   /********************************/
 
-  // Convert a signed integer distance from A in half steps
-// to a Hz value suitable for an oscillator
-function StepsToHzNote(halfSteps){
-  var value = Math.pow(1.059460646483, halfSteps) * 440;
-  return value;
-}
-
-// Calculate how far a note is from A4 (440Hz)
-function halfStepsFromA(noteIndex,octave){
-  // Convert octave value
-  // MIDI octave 4 is octave 0
-  octave = octave - 4;
-
-  // Default to octave 0 (where you find middle C)
-  if (typeof octave === 'undefined'){
-    octave = 0;
-  }
-  return noteIndex + (octave * 12);
-}
-
-// Convert an ASCII character and # or b into
-// a 0-11 note value. This note does not specify
-// an octave.
-function charToNoteIndex(s, offset){
-  // Get ASCII value of char
-  var i = s.charCodeAt(0);
-
-  // make musical letters uppercase
-  if (i < 104 && i > 96){
-    i -= 32;
-  }
-  // not a musical letter
-  else if(i < 65 || i > 71){
-    return null;
-  }
-  // refer to letter notes as in range 0-6 
-  i -= 65;
-
-  // space out to # of half steps from A
-  switch(i){
-    case 0: i = 0; break;  // A
-    // skip                   A#
-    case 1: i = 2; break;  // B
-    case 2: i = 3; break;  // C
-    // skip                   C#
-    case 3: i = 5; break;  // D
-    // skip                   D#
-    case 4: i = 7; break;  // E
-    case 5: i = 8; break;  // F
-    // skip                   F#
-    case 6: i = 10; break; // G
-    // skip                   G#
+    // Convert a signed integer distance from A in half steps
+  // to a Hz value suitable for an oscillator
+  function stepsToHzNote(halfSteps){
+    var value = Math.pow(1.059460646483, halfSteps) * 440;
+    return value;
   }
 
-  // adjust for sharp or flat note
-  i += offset;
+  // Calculate how far a note is from A4 (440Hz)
+  function halfStepsFromA(noteIndex,octave){
+    // Convert octave value
+    // MIDI octave 4 is octave 0
+    octave = octave - 4;
 
-  return i;
-}
-
-// Parse an input string like 'A' or 'B0'
-// or 'C#4' or 'Db6' into a distance from A in half steps
-function stringToStepsFromA(s,octave){
-  var offset = 0, steps, HzNote; // handle sharp or flat
-  if (typeof s === 'undefined' || s === ''){
-    s = 'A';
-  }
-  // set default or get octave from note string
-  if (typeof octave === 'undefined'){
-    if (isNaN(s.charAt(s.length-1))){
-      octave = 4; 
+    // Default to octave 0 (where you find middle C)
+    if (typeof octave === 'undefined'){
+      octave = 0;
     }
-    else{
-      octave = s.charAt(s.length -1);
-      s = s.substr(0,s.length - 1);
+    return noteIndex + (octave * 12);
+  }
+
+  // Convert an ASCII character and # or b into
+  // a 0-11 note value. This note does not specify
+  // an octave.
+  function charToNoteIndex(s, offset){
+    // Get ASCII value of char
+    var i = s.charCodeAt(0);
+
+    // make musical letters uppercase
+    if (i < 104 && i > 96){
+      i -= 32;
     }
-  }
-
-  if(s.length > 1){
-    var char1 = s.charAt(1);
-    if(char1 === '#'){
-      offset = 1;
-      s = s.substr(0,1);
+    // not a musical letter
+    else if(i < 65 || i > 71){
+      return null;
     }
-    else if (char1 === 'b'){
-      offset = -1;
-      s = s.substr(0,1);
+    // refer to letter notes as in range 0-6 
+    i -= 65;
+
+    // space out to # of half steps from A
+    switch(i){
+      case 0: i = 0; break;  // A
+      // skip                   A#
+      case 1: i = 2; break;  // B
+      case 2: i = 3; break;  // C
+      // skip                   C#
+      case 3: i = 5; break;  // D
+      // skip                   D#
+      case 4: i = 7; break;  // E
+      case 5: i = 8; break;  // F
+      // skip                   F#
+      case 6: i = 10; break; // G
+      // skip                   G#
     }
+
+    // adjust for sharp or flat note
+    i += offset;
+
+    return i;
   }
 
-  var noteIndex = charToNoteIndex(s,offset);
-  var steps = halfStepsFromA(noteIndex, octave);
-  return steps;
-}
-// into a HzNote suitable
-// for an oscillator object
-function stringToHzNote(s,octave){
-  return StepsToHzNote(stringToStepsFromA(s,octave));
-}
+  // Parse an input string like 'A' or 'B0'
+  // or 'C#4' or 'Db6' into a distance from A in half steps
+  function stringToStepsFromA(s,octave){
+    var offset = 0; // handle sharp or flat
+    if (typeof s === 'undefined' || s === ''){
+      s = 'A';
+    }
+    // set default or get octave from note string
+    if (typeof octave === 'undefined'){
+      if (isNaN(s.charAt(s.length-1))){
+        octave = 4;
+      }
+      else{
+        octave = s.charAt(s.length -1);
+        s = s.substr(0,s.length - 1);
+      }
+    }
 
-// Returns a random number between min and max
-function getRandomArbitrary(min, max) {
-  return Math.floor(Math.random() * (max - min) + min);
-}
+    if(s.length > 1){
+      var char1 = s.charAt(1);
+      if(char1 === '#'){
+        offset = 1;
+        s = s.substr(0,1);
+      }
+      else if (char1 === 'b'){
+        offset = -1;
+        s = s.substr(0,1);
+      }
+    }
 
-function getWrapped(index,max){
-  if(index > max){
-    index -= max;
+    var noteIndex = charToNoteIndex(s,offset);
+    var steps = halfStepsFromA(noteIndex, octave);
+    return steps;
   }
-  else if (index < 0){
-    index = max % index;
-  }
-  return index;
-}
-
-function getScale(type,root){
-  var types = {
-    'minor': [0,2,3,5,7,8,10],
-    'major': [0,2,4,5,7,9,10],
-    'pentatonic': [0,3,5,7,10],
-    'blues': [0,3,5,6,7,10]
-  }
-  console.log(type);
-  var scale = types[type];
-
-  for(var i = 0; i < scale.length; i++){
-    scale[i] = getWrapped((scale[i] + root), 11);
+  // into a HzNote suitable
+  // for an oscillator object
+  function stringToHzNote(s,octave){
+    return stepsToHzNote(stringToStepsFromA(s,octave));
   }
 
-  return scale;
-}
+  // Returns a random number between min and max
+  function getRandomArbitrary(min, max) {
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+
+  function getWrapped(index,max){
+    if(index > max){
+      index -= max;
+    }
+    else if (index < 0){
+      index = max % index;
+    }
+    return index;
+  }
+
+  function getScale(type,root){
+    var types = {
+      'minor': [0,2,3,5,7,8,10],
+      'major': [0,2,4,5,7,9,10],
+      'pentatonic': [0,3,5,7,10],
+      'blues': [0,3,5,6,7,10]
+    };
+    var scale = types[type];
+
+    for(var i = 0; i < scale.length; i++){
+      scale[i] = getWrapped((scale[i] + root), 11);
+    }
+
+    return scale;
+  }
 
 
   return Bleep;
