@@ -1,14 +1,14 @@
 var Bleep = (function() {
-  "use strict";
+  'use strict';
 
   function Bleep(){};
 
-  Bleep.version = "0.0.1";
+  Bleep.version = '0.0.1';
 
   var Settings = Bleep.settings = {
     bpm: 90,
     defaultNoteLength: 16,
-    waveform: "sine",
+    waveform: 'sine',
     masterVolume: 1
   };
 
@@ -69,22 +69,22 @@ var Bleep = (function() {
 
   // Customize toString() methods
   SettingEvent.prototype.toString = function(){
-    return "Setting: " + this.settingName.toString() + " = " +  this.settingVal.toString(); 
-  }
+    return 'Setting: ' + this.settingName.toString() + ' = ' +  this.settingVal.toString();
+  };
   RestEvent.prototype.toString = function(){
-    return "Rest: length: " +  this.noteLength.toString(); 
-  }
+    return 'Rest: length: ' +  this.noteLength.toString();
+  };
   NoteEvent.prototype.toString = function(){
     var hz = Number(this.HzNote).toFixed(2).toString();
-    return "Note: " +  hz + " Hz " + "length: " + this.noteLength.toString();
-  }
+    return 'Note: ' +  hz + ' Hz ' + 'length: ' + this.noteLength.toString();
+  };
 
 
   /***** Initialize Audio Context *****/
 
 
   // AudioContext instance used for sound generation
-  var AC = new window.AudioContext;
+  var AC = new window.AudioContext();
   // Create and set master volume node
   var MasterGain = AC.createGain();
   MasterGain.connect(AC.destination);
@@ -99,10 +99,16 @@ var Bleep = (function() {
   var OnNoteFunctions = Bleep.onNoteFunctions = [];
   var OnListChangeFunctions = Bleep.onNoteFunctions = [];
 
+  function runCallbacks(fns){
+    for(var i = 0; i < fns.length; i++){
+      fns[i]();
+    }
+  }
 
-  /**************************************/
-  /***** Bleep Primary User Methods *****/
-  /**************************************/
+
+  /****************************************/
+  /***** Bleep Primary User Functions *****/
+  /****************************************/
 
   // Play a tone
   // note is a string like 'A' or 'B0' or 'C#4' or 'Db6'
@@ -122,9 +128,9 @@ var Bleep = (function() {
     var note = new NoteEvent(HzNote,noteLength);
     Bleep.pendingEvents.doPush(note);
 
-    console.log("Pushed note to queue: " + noteString);
+    console.log('Pushed note to queue: ' + noteString);
     console.log(note);
-  }
+  };
 
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
@@ -133,22 +139,98 @@ var Bleep = (function() {
     var rest = new RestEvent(restNoteLength);
     Bleep.pendingEvents.doPush(rest);
 
-    console.log("Pushed rest to queue: " + restString);
+    console.log('Pushed rest to queue: ' + restString);
     console.log(rest);
-  }
+  };
 
+  // Add a callback function for after a note ends
   Bleep.onNoteEnd = function(fn){
     OnNoteFunctions.push(fn);
-  }
+  };
+
+  // Add a callback function for event add
   Bleep.onListChange = function(fn){
     OnListChangeFunctions.push(fn);
-  }
+  };
 
-  function runCallbacks(fns){
-    for(var i = 0; i < fns.length; i++){
-      fns[i]();
+  Bleep.sequence = function(seq){
+    for(var n in seq){
+      var note = seq[n];
+      if (note.constructor.name === 'Array'){
+        Bleep.tone(note[0],note[1],note[2]);
+      }
+      else{
+        Bleep.tone(note);
+      }
     }
-  }
+  };
+
+  Bleep.getEvents = function(){
+    if (Bleep.liveEvents.length === 0){
+      return Bleep.pendingEvents;
+    }
+    else{
+      return Bleep.liveEvents;
+    }
+  };
+
+  // Create events for setting changes
+  Bleep.setbpm = function(val){
+    
+    var e = new SettingEvent('bpm',val);
+
+    Bleep.pendingEvents.doPush(e);
+    console.log('Pushed bpm event to queue:');
+    console.log(e);
+  };
+
+  Bleep.setWaveform = function(s){
+    var e = new SettingEvent('waveform',s);
+    Bleep.pendingEvents.doPush(e);
+    console.log('Pushed waveform event to queue:');
+    console.log(e);
+  };
+
+  Bleep.setMasterVolume = function(s){
+    var e = new SettingEvent('masterVolume',parseFloat(s));
+    Bleep.pendingEvents.doPush(e);
+    console.log('Pushed masterVolume event to queue:');
+    console.log(e);
+  };
+
+  Bleep.liveSetMasterVolume = function(v){
+    v = parseFloat(v);
+    Settings.masterVolume = v;
+    MasterGain.gain.value = v;
+  };
+
+
+  Bleep.stop = function(){
+    Bleep.liveEvents = new EventQueue();
+  };
+
+  // Begin playback
+  Bleep.start = function(){
+    // Stop any pending sounds from last call to start()
+    if (ACTIVE_NOTES === true){
+      Bleep.stop();
+      setTimeout(function(){
+        Bleep.start();
+      },20);
+    }
+    else{
+      Bleep.liveEvents = Bleep.pendingEvents;
+      Bleep.pendingEvents = new EventQueue();
+
+      var e = prepareNextEvent();
+      if (e === null){
+        return false;
+      }
+      else{
+        handleEvent(e);
+      }
+    }
+  };
 
   function handleEvent(e){
     if (e === null){
@@ -203,11 +285,10 @@ var Bleep = (function() {
     // set up next event
     var e = Bleep.liveEvents.shift();
 
-
-    if (e.constructor.name === "SettingEvent"){
+    if (e.constructor.name === 'SettingEvent'){
       // update value
       Settings[e.settingName] = e.settingVal;
-      console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
+      console.log('made setting ' + e.settingName + ' : ' + Settings[e.settingName]);
       // recurse
       if(Bleep.liveEvents.length === 0){
         runCallbacks(OnNoteFunctions);
@@ -223,7 +304,7 @@ var Bleep = (function() {
 
     e.o = AC.createOscillator();
     e.o.type = Settings.waveform;
-    e.o.frequency.value = parseFloat(e.HzNote); 
+    e.o.frequency.value = parseFloat(e.HzNote);
     e.o.connect(e.g);
     e.o.start(0);
 
@@ -231,32 +312,6 @@ var Bleep = (function() {
     e.volume = setVolumeForWaveformType(e.o,e);
 
     return e;
-  }
-
-  Bleep.stop = function(){
-    Bleep.liveEvents = new EventQueue();
-  }
-
-  Bleep.start = function(){
-    // Stop any pending sounds from last call to start()
-    if (ACTIVE_NOTES === true){
-      Bleep.stop();
-      setTimeout(function(){
-        Bleep.start();
-      },20);
-    }
-    else{
-      Bleep.liveEvents = Bleep.pendingEvents;
-      Bleep.pendingEvents = new EventQueue();
-
-      var e = prepareNextEvent();
-      if (e === null){
-        return false;
-      }
-      else{
-        handleEvent(e);
-      }
-    }
   }
 
   // Convert a duration to ms using current BPM
@@ -268,18 +323,14 @@ var Bleep = (function() {
   // Adjust the volume for wave type variations
   function setVolumeForWaveformType(o,e){
     switch(o.type){
-      case "sine" : 
+      case 'sine' :
         return e.volume * 1;
-      break;
-      case "square":
+      case 'square':
         return e.volume * 0.3;
-      break;
-      case "sawtooth":
+      case 'sawtooth':
         return e.volume * 0.4;
-      break;
-      case "triangle":
+      case 'triangle':
         return e.volume * 0.8;
-      break;
     }
   }
 
@@ -287,7 +338,7 @@ var Bleep = (function() {
     if (typeof arg === 'undefined'){
       return Settings.defaultNoteLength;
     }
-    else if (typeof arg === "number"){
+    else if (typeof arg === 'number'){
       return Number(arg);
     }
     else if (arg.charAt(0) === 'R'){
@@ -299,38 +350,10 @@ var Bleep = (function() {
       }
     }
     else {
-      throw "Invalid rest parameter: " + arg
+      throw 'Invalid rest parameter: ' + arg;
     }
   }
 
-  Bleep.setbpm = function(val){
-    
-    var e = new SettingEvent("bpm",val);
-
-    Bleep.pendingEvents.doPush(e);
-    console.log("Pushed bpm event to queue:");
-    console.log(e);
-  }
-
-  Bleep.setWaveform = function(s){
-    var e = new SettingEvent("waveform",s);
-    Bleep.pendingEvents.doPush(e);
-    console.log("Pushed waveform event to queue:");
-    console.log(e);
-  }
-
-  Bleep.setMasterVolume = function(s){
-    var e = new SettingEvent("masterVolume",parseFloat(s));
-    Bleep.pendingEvents.doPush(e);
-    console.log("Pushed masterVolume event to queue:");
-    console.log(e);
-  }
-
-  Bleep.liveSetMasterVolume = function(v){
-    v = parseFloat(v);
-    Settings.masterVolume = v;
-    MasterGain.gain.value = v;
-  }
 
   // interval measured in half steps
   function getRandomInterval(){
@@ -362,13 +385,12 @@ var Bleep = (function() {
       prevoiusInterval = getRandomInterval();
     }
     var interval;
-    var switchChance = getRandomArbitrary(0,9);
     var newIntervalChance = getRandomArbitrary(0,9);
     var directionChance = getRandomArbitrary(0,9);
 
     var direction = 1;
     if (prevoiusInterval < 0){
-      var direction = -1; // 1 is up, -1 down
+      direction = -1; // 1 is up, -1 down
     }
 
     // 40% chance of switching to a different interval
@@ -384,7 +406,7 @@ var Bleep = (function() {
       direction = (direction * -1);
     }
 
-    console.log("made interval: " + interval + " direction: " + direction )
+    console.log('made interval: ' + interval + ' direction: ' + direction );
     return interval * direction;
 
   }
@@ -407,16 +429,16 @@ var Bleep = (function() {
       }
       else if (i < params.notes - 1){
         var interval = generateInterval(prevoiusInterval);
-        console.log("interval: " + interval + " previousNote: " + previousNote +  " newNote: " + (previousNote + interval));
+        console.log('interval: ' + interval + ' previousNote: ' + previousNote +  ' newNote: ' + (previousNote + interval));
         var scaleDegree = (previousNote + interval) % (scale.length - 1);
-        console.log("scale degree is " + scaleDegree + " of " + scale.length);
+        console.log('scale degree is ' + scaleDegree + ' of ' + scale.length);
         noteVal = scale[scaleDegree];
         octave = params.octave + getRandomArbitrary(0,params.octaveRange);
         HzNote = StepsToHzNote(halfStepsFromA(noteVal,octave));
       }
       // Always end on the root note of the scale
       else{
-        console.log("root note")
+        console.log('root note');
         noteVal = halfStepsFromA(params.rootNote,4);
         HzNote = StepsToHzNote(noteVal);
       }
@@ -427,7 +449,7 @@ var Bleep = (function() {
 
       prevoiusInterval = interval;
       previousNote = noteVal;
-      console.log("made prevNote: " + previousNote);
+      console.log('made prevNote: ' + previousNote);
     }
   }
 
@@ -436,7 +458,7 @@ var Bleep = (function() {
     var dp = {
       rootNote: getRandomArbitrary(0,12),
       notes: 6,
-      scaleType: "minor",
+      scaleType: 'minor',
       noteLength: 32,
       bpm: Settings.bpm,
       octaveRange: 1,
@@ -458,7 +480,7 @@ var Bleep = (function() {
     octave = params.octave;
     scale = params.scale;
 
-    if(params.direction === "up"){
+    if(params.direction === 'up'){
       directionVal = 1;
       lastNoteInOctave = 0;
     }
@@ -472,7 +494,7 @@ var Bleep = (function() {
 
       if (noteVal === scale[lastNoteInOctave]){
         if (octave - params.octave > (params.octaveRange - 1)){
-          console.log("resetting octave");
+          console.log('resetting octave');
           octave = params.octave;
         }
         else{
@@ -490,7 +512,7 @@ var Bleep = (function() {
   function getNextNote(i, params){
     var scaleLength = params.scale.length;
 
-    if(params.direction === "up"){
+    if(params.direction === 'up'){
       return (i + 1) % scaleLength;
     }
     else {
@@ -501,14 +523,14 @@ var Bleep = (function() {
   function setArpParams(params){
     // default params
     var dp = {
-      rootNote: "A",
+      rootNote: 'A',
       notes: 20,
-      scaleType: "minor",
+      scaleType: 'minor',
       noteLength: 32,
       bpm: Settings.bpm,
       octaveRange: 1,
       octave: 4,
-      direction: "up"
+      direction: 'up'
     }
 
     return setFooParams(params, dp);
@@ -525,33 +547,13 @@ var Bleep = (function() {
     }
 
     // convert root note from string to steps
-    if(typeof dp.rootNote === "string"){
+    if(typeof dp.rootNote === 'string'){
       dp.rootNote = stringToStepsFromA(dp.rootNote)
     }
 
     return dp;
   }
 
-  Bleep.sequence = function(seq){
-    for(var n in seq){
-      var note = seq[n];
-      if (note.constructor.name === 'Array'){
-        Bleep.tone(note[0],note[1],note[2]);
-      }
-      else{
-        Bleep.tone(note);
-      }
-    }
-  }
-
-  Bleep.getEvents = function(){
-    if (Bleep.liveEvents.length === 0){
-      return Bleep.pendingEvents;
-    }
-    else{
-      return Bleep.liveEvents;
-    }
-  }
 
 
 
@@ -676,10 +678,10 @@ function getWrapped(index,max){
 
 function getScale(type,root){
   var types = {
-    "minor": [0,2,3,5,7,8,10],
-    "major": [0,2,4,5,7,9,10],
-    "pentatonic": [0,3,5,7,10],
-    "blues": [0,3,5,6,7,10]
+    'minor': [0,2,3,5,7,8,10],
+    'major': [0,2,4,5,7,9,10],
+    'pentatonic': [0,3,5,7,10],
+    'blues': [0,3,5,6,7,10]
   }
   console.log(type);
   var scale = types[type];
