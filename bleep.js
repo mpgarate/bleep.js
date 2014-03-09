@@ -3,7 +3,7 @@ var Bleep = (function() {
 
   function Bleep(){}
 
-  Bleep.version = '0.0.1';
+  Bleep.version = '1.0.0';
 
   var Settings = Bleep.settings = {
     bpm: 90,
