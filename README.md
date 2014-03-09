@@ -118,13 +118,13 @@ Advanced Usage
 
 View events in the queue with the `events` property
 ~~~ js
-Bleep.events; // returns array of NoteEvent objects
+Bleep.getEvents(); // returns array of NoteEvent objects
 ~~~
 
 You can modify events before calling `play()`. For example:
 ~~~ js
 Bleep.tone("A4"); //default duration
-Bleep.events[0].duration = 1; //change duration to measure length
+Bleep.pendingEvents[0].duration = 1; //change duration to measure length
 Bleep.start(); // Tone 'A4' is played for the new duration
 ~~~
 
