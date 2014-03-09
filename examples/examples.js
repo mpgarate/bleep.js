@@ -60,7 +60,7 @@ $( document ).ready(function() { /*
 
     $( "#slider" ).slider();  
 
-  function show_queue(){
+  function showQueue(){
     var list = $('.list-group');
 
     list.html("");
@@ -68,9 +68,17 @@ $( document ).ready(function() { /*
     var events = Bleep.getEvents();
 
     for (var i = 0; i < events.length; i++){
-      list.append('<li class="list-group-item">' + (Number(events[i].HzNote)).toFixed(2) + ' Hz </li>');
+      list.append('<li class="list-group-item">' + events[i].toString() + '</li>');
     }
   }
+
+
+  Bleep.onListChange(function(){
+    showQueue();
+  });
+  Bleep.onNoteEnd(function(){
+    showQueue();
+  });
 
   $('.bloop-fn').click(function(){
     Bleep.bloop();
@@ -80,8 +88,8 @@ $( document ).ready(function() { /*
   $('.bloop-saw').click(function(){
     Bleep.setWaveform("sawtooth"); // indicate sine, sqaure, sawtooth, or triangle
     Bleep.bloop();
-    Bleep.start();
     Bleep.setWaveform("sine");     // reset the waveform for future use of Bleep 
+    Bleep.start();
   });
 
   $('.stop').click(function(){
@@ -141,14 +149,6 @@ $( document ).ready(function() { /*
       ]
     Bleep.sequence(lambSeq);
     Bleep.start();
-  });
-
-
-  Bleep.onListChange(function(){
-    show_queue();
-  });
-  Bleep.onNoteEnd(function(){
-    show_queue();
   });
 
 });

@@ -14,9 +14,7 @@ window.Bleep = (function() {
   Bleep.pendingEvents = new EventQueue();  // This queue can be built during playback
 
   // Event parent object
-  function Event(){
-    this.noteLength;
-  }
+  function Event(){};
   
   // Event Object for rests, pauses in music playback
   function RestEvent(noteLength){
@@ -48,6 +46,17 @@ window.Bleep = (function() {
   RestEvent.prototype.constructor = RestEvent;
   NoteEvent.prototype.constructor = NoteEvent;
   SettingEvent.prototype.constructor = SettingEvent;
+
+  SettingEvent.prototype.toString = function(){
+    return "Setting: " + this.settingName.toString() + " " +  this.settingVal.toString(); 
+  }
+  RestEvent.prototype.toString = function(){
+    return "Rest: length: " +  this.noteLength.toString(); 
+  }
+  NoteEvent.prototype.toString = function(){
+    var hz = Number(this.HzNote).toFixed(2).toString();
+    return "Note: " +  hz + " Hz " + "length: " + this.noteLength.toString();
+  }
 
   var Settings = Bleep.settings = {
     bpm: 90,
@@ -148,8 +157,6 @@ window.Bleep = (function() {
       ACTIVE_NOTES = false;
     }, e.duration - 10);
 
-    runCallbacks(OnNoteFunctions);
-
     console.log("handling event:");
     console.log(e);
 
@@ -158,10 +165,12 @@ window.Bleep = (function() {
       return;
     }
 
-    // events[0] is the next event in queue
-
 
     var nextEvent = prepareNextEvent();
+    if (nextEvent === null){
+      runCallbacks(OnNoteFunctions);
+      return;
+    }
 
     // call self with the next in queue
     setTimeout(function(){
@@ -178,13 +187,16 @@ window.Bleep = (function() {
     // set up next event
     var e = Bleep.liveEvents.shift();
 
+
     if (e.constructor.name === "SettingEvent"){
       // update value
       Settings[e.settingName] = e.settingVal;
       console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
       // recurse
+      runCallbacks(OnNoteFunctions);
       return prepareNextEvent();
     }
+
 
     e.g = AC.createGain();
     e.g.connect(MASTER_GAIN);
