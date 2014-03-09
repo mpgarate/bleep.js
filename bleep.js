@@ -1,4 +1,5 @@
 window.Bleep = (function() {
+  "use strict";
 
   function Bleep(){};
   function EventQueue(){};
@@ -67,10 +68,10 @@ window.Bleep = (function() {
 
 
   // AudioContext instance used for sound generation
-  AC = new window.AudioContext;
-  MASTER_GAIN = AC.createGain();
-  MASTER_GAIN.connect(AC.destination);
-  MASTER_GAIN.gain.value = Settings.masterVolume;
+  var AC = new window.AudioContext;
+  var MasterGain = AC.createGain();
+  MasterGain.connect(AC.destination);
+  MasterGain.gain.value = Settings.masterVolume;
 
   // Queue for handling events
   var ACTIVE_NOTES = false;
@@ -105,7 +106,7 @@ window.Bleep = (function() {
   // Play silence for a given duration.
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
   Bleep.rest = function(restString){
-    restNoteLength = restArgToDuration(restString);
+    var restNoteLength = restArgToDuration(restString);
     var rest = new RestEvent(restNoteLength);
     Bleep.pendingEvents.doPush(rest);
 
@@ -194,7 +195,7 @@ window.Bleep = (function() {
 
 
     e.g = AC.createGain();
-    e.g.connect(MASTER_GAIN);
+    e.g.connect(MasterGain);
     e.g.gain.value = 0;
 
     e.o = AC.createOscillator();
@@ -237,12 +238,12 @@ window.Bleep = (function() {
 
   // Convert a duration to ms using current BPM
   // duration: 1 = 1 beat. 1 = 1/2 note. 4 = 1/4 note. 8 = 1/8 note
-  noteLengthToMs = function(d){
+  function noteLengthToMs(d){
     return ((60000) / (Settings.bpm * (d/4)));
   }
 
   // Adjust the volume for wave type variations
-  setVolumeForWaveformType = function(o,e){
+  function setVolumeForWaveformType(o,e){
     switch(o.type){
       case "sine" : 
         return e.volume * 1;
@@ -259,7 +260,7 @@ window.Bleep = (function() {
     }
   }
 
-  restArgToDuration = function(arg){
+  function restArgToDuration(arg){
     if (typeof arg === 'undefined'){
       return Settings.defaultNoteLength;
     }
@@ -305,7 +306,7 @@ window.Bleep = (function() {
   Bleep.liveSetMasterVolume = function(v){
     v = parseFloat(v);
     Settings.masterVolume = v;
-    MASTER_GAIN.gain.value = v;
+    MasterGain.gain.value = v;
   }
 
   // interval measured in half steps
