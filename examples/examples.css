@@ -5,4 +5,5 @@ body {
 
 .sidebar{
   position: fixed;
+  min-width: 283px;
 }

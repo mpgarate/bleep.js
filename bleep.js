@@ -48,7 +48,7 @@ window.Bleep = (function() {
   SettingEvent.prototype.constructor = SettingEvent;
 
   SettingEvent.prototype.toString = function(){
-    return "Setting: " + this.settingName.toString() + " " +  this.settingVal.toString(); 
+    return "Setting: " + this.settingName.toString() + " = " +  this.settingVal.toString(); 
   }
   RestEvent.prototype.toString = function(){
     return "Rest: length: " +  this.noteLength.toString(); 
@@ -153,29 +153,19 @@ window.Bleep = (function() {
     // schedule its end
     setTimeout(function(){
       e.g.gain.value = 0;
-      runCallbacks(OnNoteFunctions);
       ACTIVE_NOTES = false;
-    }, e.duration - 10);
-
-    console.log("handling event:");
-    console.log(e);
-
-    // if last event, nothing to do
-    if (Bleep.liveEvents.length === 0){
-      return;
-    }
-
+    }, e.duration);
 
     var nextEvent = prepareNextEvent();
     if (nextEvent === null){
-      runCallbacks(OnNoteFunctions);
+      setTimeout(function(){
+        runCallbacks(OnNoteFunctions);
+      }, e.duration - 2);
       return;
     }
 
     // call self with the next in queue
     setTimeout(function(){
-      console.log("calling handleEvent on ");
-      console.log(nextEvent);
       handleEvent(nextEvent);
     }, e.duration);
   }
@@ -184,6 +174,8 @@ window.Bleep = (function() {
     if(Bleep.liveEvents.length === 0){
       return null;
     }
+
+      runCallbacks(OnNoteFunctions);
     // set up next event
     var e = Bleep.liveEvents.shift();
 
@@ -193,7 +185,10 @@ window.Bleep = (function() {
       Settings[e.settingName] = e.settingVal;
       console.log("made setting " + e.settingName + " : " + Settings[e.settingName]);
       // recurse
-      runCallbacks(OnNoteFunctions);
+      if(Bleep.liveEvents.length === 0){
+        runCallbacks(OnNoteFunctions);
+        return null;
+      }
       return prepareNextEvent();
     }
 
@@ -397,6 +392,7 @@ window.Bleep = (function() {
       }
       // Always end on the root note of the scale
       else{
+        console.log("root note")
         noteVal = halfStepsFromA(params.rootNote,4);
         HzNote = StepsToHzNote(noteVal);
       }

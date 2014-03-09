@@ -70,6 +70,9 @@ $( document ).ready(function() { /*
     for (var i = 0; i < events.length; i++){
       list.append('<li class="list-group-item">' + events[i].toString() + '</li>');
     }
+    if(events.length === 0){
+      list.append('<li class="list-group-item">Event queue is empty. </li>');
+    }
   }
 
 
