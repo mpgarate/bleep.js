@@ -152,7 +152,7 @@ Bleep.onListChange(function(){
 });
 ~~~
 
-View events in the queue with the `events` property
+View events in the queue with the `getEvents()`
 ~~~ js
 Bleep.getEvents(); // returns array of NoteEvent objects
 ~~~
