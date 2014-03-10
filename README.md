@@ -116,6 +116,16 @@ Bleep.liveSetMasterVolume(value);
 
 Advanced Usage
 --------
+Supply callback functions to run on note playback end or when a note is added to the queue. This is used in the demo to redraw the visual queue.
+
+~~~ js
+Bleep.onNoteEnd(function(){
+  showQueue();
+});
+Bleep.onListChange(function(){
+  showQueue();
+});
+~~~
 
 View events in the queue with the `events` property
 ~~~ js
@@ -128,4 +138,6 @@ Bleep.tone("A4"); //default duration
 Bleep.pendingEvents[0].duration = 1; //change duration to measure length
 Bleep.start(); // Tone 'A4' is played for the new duration
 ~~~
+
+After `start()` has been called, `Bleep.pendingEvents` is copied to `Bleep.liveEvents` and then cleared. 
 
