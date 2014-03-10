@@ -75,7 +75,7 @@ Bleep.start();
 "A", 4  // quarter note
 "A", 8  // eigth note
 "A", 16 // sixteenth note
-"A", 32 // thiry-second note
+"A", 32 // thirty-second note
 
 "A", 3  // dotted quarter note
 "A", 6  // dotted eigth note
