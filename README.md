@@ -13,6 +13,7 @@ Bleep depends on AudioContext or webkitAudioContext, currently only available in
 Basic usage
 -----------
 
+
 Calling `bloop()` generates a short, pleasing retro arp sound.
 ~~~ js
 Bleep.bloop();
@@ -52,6 +53,36 @@ Bleep.tone("C4"); //Bleep.tone(note); // default duration: 16th note
 Bleep.tone("A#2",16); //Bleep.tone(note, duration);
 Bleep.tone("C", 2, 4); //Bleep.tone(note, duration, octave);
 Bleep.start();
+~~~
+
+
+#### Valid Input Strings
+~~~ js
+// Notes
+
+"A","B","C","D","E","F","G" // by default in octave 4
+"A#","Ab","Bb","C#","Db","D#","Eb","F#","Gb","G#","Ab"
+
+// Valid octaves: 0 - 7
+
+"A3"    // octave 3. 
+"Ab3"   // octave 3.
+
+// Note durations
+
+"A", 1  // whole note
+"A", 2  // half note
+"A", 4  // quarter note
+"A", 8  // eigth note
+"A", 16 // sixteenth note
+"A", 32 // thiry-second note
+
+"A", 3  // dotted quarter note
+"A", 6  // dotted eigth note
+"A", 12 // dotted sixteenth note
+"A", 24 // dotted thiry-second note
+
+
 ~~~
 
 
