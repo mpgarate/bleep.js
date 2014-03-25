@@ -110,4 +110,10 @@ $( document ).ready(function() {
     Bleep.start();
   });
 
+
+  $('.bloop-scoop').click(function(){
+    Bleep.bloopScoopDaWoop();
+    Bleep.start();
+  });
+
 });

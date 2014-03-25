@@ -254,6 +254,15 @@ var Bleep = (function() {
   };
 
 
+  Bleep.bloopScoopDaWoop = function(){
+    var seq = [
+      "C", "C", "Eb","C",["G",6],["G",6],["F",8],"R8",
+      "C", "C", "Eb","C",["F",6],["F",6],["Eb",8],"R8",
+      "C", "C", "Eb","C",["Eb",6],["F",6],["D",6],"C",["Bb",6],"R8",
+      ["Bb",8],["F",4],["Eb",4]
+    ]
+    Bleep.sequence(seq);
+  }
 
 
 
