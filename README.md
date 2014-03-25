@@ -63,7 +63,7 @@ Bleep.start();
 "A","B","C","D","E","F","G" // by default in octave 4
 "A#","Ab","Bb","C#","Db","D#","Eb","F#","Gb","G#","Ab"
 
-// Valid octaves: 0 - 7
+// Valid octaves: 0 - 8
 
 "A3"    // octave 3. 
 "Ab3"   // octave 3.
