@@ -138,7 +138,7 @@ $( document ).ready(function() {
       Bleep.rest(length);
     }
     else{
-      Bleep.tone(note,length);
+      Bleep.tone(note,length,octave);
     }
 
   });
