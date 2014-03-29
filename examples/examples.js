@@ -111,8 +111,39 @@ $( document ).ready(function() {
   });
 
 
-  $('.bloop-scoop').click(function(){
-    Bleep.bloopScoopDaWoop();
+  $('.roll').click(function(){
+    Bleep.roll();
+    Bleep.start();
+  });
+
+  $('.enqueue-note').click(function(){
+    var note = $('.note-select').val();
+    var length = $('.length-select').val();
+    var octave = $('.octave-select').val();
+
+    if (typeof note == 'undefined'){
+      return;
+    }
+
+    if (typeof length == 'undefined'){
+      return;
+    }
+
+    length = Number(length);
+    //length = 1 / length
+
+    console.log("note:" + note + " length:" + length);
+
+    if (note == 'R'){
+      Bleep.rest(length);
+    }
+    else{
+      Bleep.tone(note,length);
+    }
+
+  });
+
+  $('.start').click(function(){
     Bleep.start();
   });
 

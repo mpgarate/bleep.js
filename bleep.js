@@ -254,7 +254,7 @@ var Bleep = (function() {
   };
 
 
-  Bleep.bloopScoopDaWoop = function(){
+  Bleep.roll = function(){
     var seq = [
       "C", "C", "Eb","C",["G",6],["G",6],["F",8],"R8",
       "C", "C", "Eb","C",["F",6],["F",6],["Eb",8],"R8",

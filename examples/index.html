@@ -162,10 +162,10 @@ Bleep.start();
 
         <!-- Code Block -->
 <pre>
-Bleep.bloopScoopDaWoop();
+Bleep.roll();
 Bleep.start();
 </pre>
-          <p><a href="javascript:;" class="btn btn-large btn-success bloop-scoop">Run code</a></p>
+          <p><a href="javascript:;" class="btn btn-large btn-success roll">Run code</a></p>
           <hr />
         <!-- End Code Block -->
 
@@ -175,6 +175,7 @@ Bleep.start();
         <div class="col-sm-4">
           <div class="sidebar pull-right">
           <p>
+            <a href="javascript:;" class="btn btn-success start">Start</a>
             <a href="javascript:;" class="btn btn-danger stop">Silence</a>
           </p>
           <p>
@@ -184,6 +185,68 @@ Bleep.start();
             <div id="slider"></div>
             <span class="volume"></span>
           </p>
+          <label>Create note</label>
+            <div class="new-note row">
+              <div class="col-sm-6">
+                <p>
+                Note / Rest
+                  <select class="form-control note-select">
+                    <option value = "R">Rest</option>
+                    <option selected>A</option>
+                    <option>A#</option>
+                    <option>B</option>
+                    <option>C</option>
+                    <option>C#</option>
+                    <option>D</option>
+                    <option>D#</option>
+                    <option>E</option>
+                    <option>F</option>
+                    <option>F#</option>
+                    <option>G</option>
+                    <option>G#</option>
+                  </select>
+                </p>
+              </div>
+
+              <div class="col-sm-6">
+                <p>
+                Length
+                  <select class="form-control length-select">
+                    <option value="1">1</option>
+                    <option value="2">1/2</option>
+                    <option value="4">1/4</option>
+                    <option value="8" selected>1/8</option>
+                    <option value="16">1/16</option>
+                    <option value="32">1/32</option>
+                    <option value="64">1/64</option>
+                  </select>
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6">
+                <p>
+                Octave
+                  <select class="form-control octave-select">
+                    <option value="" disabled>Octave</option>
+                    <option>0</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option selected>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                  </select>
+                </p>
+              </div>
+              <div class="col-sm-12">
+                <p>
+                  <a href="javascript:;" class="btn btn-primary pull-right enqueue-note" >Enqueue</a>
+                </p>
+              </div>
+            </div>
           <label>Event Queue</label>
           <br />
             <ul class="list-group">

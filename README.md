@@ -104,7 +104,7 @@ Bleep.sequence(mySequence);
 
 
 ~~~ js
-Bleep.bloopScoopDaWoop(); // Here be dragons
+Bleep.roll(); // Here be dragons
 ~~~
 
 Configure Bleep
