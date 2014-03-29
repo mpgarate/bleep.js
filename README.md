@@ -63,19 +63,27 @@ Bleep.start();
 "A","B","C","D","E","F","G" // by default in octave 4
 "A#","Ab","Bb","C#","Db","D#","Eb","F#","Gb","G#","Ab"
 
-// Valid octaves: 0 - 7
+// Valid octaves: 0 - 8
 
 "A3"    // octave 3. 
 "Ab3"   // octave 3.
 
 // Note durations
 
-"A", 1  // whole note
-"A", 2  // half note
-"A", 4  // quarter note
-"A", 8  // eigth note
-"A", 16 // sixteenth note
-"A", 32 // thirty-second note
+ 1      // whole note
+ 2      // half note
+ 4      // quarter note
+ 8      // eigth note
+ 16     // sixteenth note
+ 32     // thirty-second note
+ 
+// durations of dotted notes
+
+ 1.5    // dotted half note
+ 3      // dotted quarter note
+ 6      // dotted eigth note
+ 12     // dotted sixteenth note
+ 24     // dotted thirty-second note
 
 ~~~
 
@@ -101,7 +109,6 @@ var mySequence = [
 ]
 Bleep.sequence(mySequence);
 ~~~
-
 
 ~~~ js
 Bleep.roll(); // Here be dragons
