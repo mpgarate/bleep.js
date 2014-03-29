@@ -110,6 +110,20 @@ $( document ).ready(function() {
     Bleep.start();
   });
 
+  $('.ac-seq').click(function(){
+    // An essential 90s jam
+Bleep.setbpm(90);
+    var seq = [
+      "Bb", "R8", "D", "F","R16","Bb", "R16",
+      "F3","R8", "Bb", "C", "R6",
+      "F3", "R8", "Bb", "C", "R16", "A", "R16", ["Bb",4],
+      "R4"
+    ]
+    Bleep.sequence(seq);
+    Bleep.sequence(seq); // enqueue again to play it twice
+    Bleep.start();
+  });
+
 
   $('.roll').click(function(){
     Bleep.roll();

@@ -160,6 +160,26 @@ Bleep.start();
         <!-- End Code Block -->
 
 
+
+        <!-- Code Block -->
+<pre>
+// An essential 90s jam
+Bleep.setbpm(140);
+var seq = [
+  "Bb", "R8", "D", "F","R16","Bb", "R16",
+  "F3","R8", "Bb", "C", "R6",
+  "F3", "R8", "Bb", "C", "R16", "A", "R16", ["Bb",4],
+  "R4"
+]
+Bleep.sequence(seq);
+Bleep.sequence(seq); // enqueue again to play it twice
+Bleep.start();
+</pre>
+          <p><a href="javascript:;" class="btn btn-large btn-success ac-seq">Run code</a></p>
+          <hr />
+        <!-- End Code Block -->
+
+
         <!-- Code Block -->
 <pre>
 Bleep.roll();
