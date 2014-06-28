@@ -114,6 +114,12 @@ Bleep.sequence(mySequence);
 Bleep.roll(); // Here be dragons
 ~~~
 
+Get a scale set with 'getScale()'
+~~~ js
+  var scaleSet = Bleep.getScale('minor','Bb')
+  // -> ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'Ab']
+~~~
+
 Configure Bleep
 --------
 Adjust these before calling arp, bloop, tone. 
