@@ -264,6 +264,24 @@ var Bleep = (function() {
     Bleep.sequence(seq);
   }
 
+  Bleep.getScale = function(type, note){
+
+    // get sharp or flat symbol, if present
+    var lastChar = note.charAt(note.length - 1);
+    var sharpOrFlat;
+
+    if (lastChar !== lastChar.toUpperCase()){
+      sharpOrFlat = lastChar;
+    }
+
+    var noteSteps = stringToStepsFromA(note);
+    var scale = getScale(type, noteSteps);
+
+    for (var i = 0; i < scale.length; i++){
+      scale[i] = noteIndexToString(scale[i], sharpOrFlat);
+    }
+    return scale;
+  }
 
 
   /********************************/
@@ -665,6 +683,46 @@ var Bleep = (function() {
     return i;
   }
 
+  function noteIndexToString(index,sharpOrFlat){
+
+    if (typeof sharpOrFlat === 'undefined'){
+      sharpOrFlat = '#';
+    }
+
+    if (sharpOrFlat === '#'){
+      switch(index){
+        case 0: return 'A';
+        case 1: return 'A#';
+        case 2: return 'B'; 
+        case 3: return 'C'; 
+        case 4: return 'C#';
+        case 5: return 'D'; 
+        case 6: return 'D#';
+        case 7: return 'E'; 
+        case 8: return 'F'; 
+        case 9: return 'F#';
+        case 10: return 'G';
+        case 11: return  'G#';
+      }
+    } else {
+      switch(index) {
+        case 0: return 'A';
+        case 1: return 'Bb';
+        case 2: return 'B'; 
+        case 3: return 'C'; 
+        case 4: return 'Db';
+        case 5: return 'D'; 
+        case 6: return 'Eb';
+        case 7: return 'E'; 
+        case 8: return 'F'; 
+        case 9: return 'Gb';
+        case 10: return 'G';
+        case 11: return  'Ab';
+      }
+    }
+
+  }
+
   // Parse an input string like 'A' or 'B0'
   // or 'C#4' or 'Db6' into a distance from A in half steps
   function stringToStepsFromA(s,octave){
@@ -674,12 +732,14 @@ var Bleep = (function() {
     }
     // set default or get octave from note string
     if (typeof octave === 'undefined'){
-      if (isNaN(s.charAt(s.length-1))){
+      var lastCharIndex = s.length - 1;
+      // if the last character is not a number
+      if (isNaN(s.charAt(lastCharIndex))){
         octave = 4;
       }
       else{
-        octave = s.charAt(s.length -1);
-        s = s.substr(0,s.length - 1);
+        octave = s.charAt(lastCharIndex);
+        s = s.substr(0,lastCharIndex);
       }
     }
 
